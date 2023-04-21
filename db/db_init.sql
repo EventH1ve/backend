@@ -223,7 +223,6 @@ CREATE TABLE Transaction
     userID        INT,
     ticketID      INT,
     paymentMethod INT,
-    Field         Type,
     PRIMARY KEY (id),
     FOREIGN KEY (paymentMethod) REFERENCES PaymentMethod (id),
     FOREIGN KEY (userID) REFERENCES Attendee (id)
