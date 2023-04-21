@@ -1,21 +1,17 @@
-from typing import Optional
+from sqlalchemy import Column, Integer, String
 
-from pydantic import BaseModel
+from sqlalchemy.ext.declarative import declarative_base
 
-
-class UserBase(BaseModel):
-    username: str
-    email: str
-    password: str
-    phoneNumber: str
-    firstName: str
-    lastName: str
-    type: str
+Base = declarative_base()
 
 
-class User(UserBase):
-    id: Optional[int] = None
-
-
-class UserRead(UserBase):
-    id: int
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String)
+    email = Column(String)
+    password = Column(String)
+    phonenumber = Column(String)
+    firstname = Column(String)
+    lastname = Column(String)
+    type = Column(String)
