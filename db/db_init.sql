@@ -1,3 +1,16 @@
+CREATE TABLE Users
+(
+    id          SERIAL,
+    username    VARCHAR,
+    email       VARCHAR,
+    password    VARCHAR,
+    phoneNumber VARCHAR,
+    firstName   VARCHAR,
+    lastName    VARCHAR,
+    type        VARCHAR,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE Organization
 (
     id   SERIAL,
@@ -6,11 +19,51 @@ CREATE TABLE Organization
     PRIMARY KEY (id)
 );
 
+CREATE TABLE EventStatus
+(
+    id     SERIAL,
+    status VARCHAR,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE EventType
+(
+    id   SERIAL,
+    type VARCHAR,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE Venue
+(
+    id          SERIAL,
+    name        VARCHAR,
+    capacity    INT,
+    description VARCHAR,
+    createdBy   VARCHAR,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE PaymentMethod
+(
+    id     SERIAL,
+    method VARCHAR,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE ContactPerson
+(
+    id          SERIAL,
+    name        VARCHAR,
+    phoneNumber VARCHAR,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE Organizer
 (
     id     SERIAL,
     userID INT,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (userID) REFERENCES Users (id)
 );
 
 CREATE TABLE OrganizerOrganization
@@ -27,7 +80,8 @@ CREATE TABLE Attendee
 (
     id     SERIAL,
     userID INT,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (userID) REFERENCES Users (id)
 );
 
 CREATE TABLE VenueAddress
@@ -38,21 +92,8 @@ CREATE TABLE VenueAddress
     streetName     VARCHAR,
     city           VARCHAR,
     country        VARCHAR,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE EventStatus
-(
-    id     SERIAL,
-    status VARCHAR,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE EventType
-(
-    id   SERIAL,
-    type VARCHAR,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (venueID) REFERENCES Venue (id)
 );
 
 CREATE TABLE Event
@@ -90,7 +131,8 @@ CREATE TABLE OrganizationAddress
     streetName     VARCHAR,
     city           VARCHAR,
     country        VARCHAR,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (orgID) REFERENCES Organization (id)
 );
 
 CREATE TABLE Administrator
@@ -99,7 +141,8 @@ CREATE TABLE Administrator
     userID INT,
     orgID  INT,
     PRIMARY KEY (id),
-    FOREIGN KEY (orgID) REFERENCES Organization (id)
+    FOREIGN KEY (orgID) REFERENCES Organization (id),
+    FOREIGN KEY (userID) REFERENCES Users (id)
 );
 
 CREATE TABLE Post
@@ -112,16 +155,6 @@ CREATE TABLE Post
     PRIMARY KEY (id),
     FOREIGN KEY (eventID) REFERENCES Event (id),
     FOREIGN KEY (userID) REFERENCES Administrator (id)
-);
-
-CREATE TABLE Venue
-(
-    id          SERIAL,
-    name        VARCHAR,
-    capacity    INT,
-    description VARCHAR,
-    createdBy   VARCHAR,
-    PRIMARY KEY (id)
 );
 
 CREATE TABLE VenueRestriction
@@ -142,13 +175,6 @@ CREATE TABLE OrganizationContact
     FOREIGN KEY (orgID) REFERENCES Organization (id)
 );
 
-CREATE TABLE PaymentMethod
-(
-    id     SERIAL,
-    method VARCHAR,
-    PRIMARY KEY (id)
-);
-
 CREATE TABLE TicketType
 (
     id      SERIAL,
@@ -162,7 +188,7 @@ CREATE TABLE Ticket
 (
     id         SERIAL,
     type       INT,
-    eventID    ID,
+    eventID    INT,
     qrCode     INT,
     seatNumber INT,
     PRIMARY KEY (id),
@@ -200,8 +226,7 @@ CREATE TABLE Transaction
     Field         Type,
     PRIMARY KEY (id),
     FOREIGN KEY (paymentMethod) REFERENCES PaymentMethod (id),
-    FOREIGN KEY (userID) REFERENCES Attendee (id),
-    KEY Key (Field)
+    FOREIGN KEY (userID) REFERENCES Attendee (id)
 );
 
 CREATE TABLE EventHost
@@ -214,14 +239,6 @@ CREATE TABLE EventHost
     FOREIGN KEY (eventID) REFERENCES Event (id)
 );
 
-CREATE TABLE ContactPerson
-(
-    id          SERIAL,
-    name        VARCHAR,
-    phoneNumber VARCHAR,
-    PRIMARY KEY (id)
-);
-
 CREATE TABLE VenueContact
 (
     id        SERIAL,
@@ -230,19 +247,6 @@ CREATE TABLE VenueContact
     PRIMARY KEY (id),
     FOREIGN KEY (contactID) REFERENCES ContactPerson (id),
     FOREIGN KEY (venueID) REFERENCES Venue (id)
-);
-
-CREATE TABLE User
-(
-    id          SERIAL,
-    username    VARCHAR,
-    email       VARCHAR,
-    password    VARCHAR,
-    phoneNumber VARCHAR,
-    firstName   VARCHAR,
-    lastName    VARCHAR,
-    type        VARCHAR,
-    PRIMARY KEY (id)
 );
 
 CREATE TABLE EventTicketCapacity
