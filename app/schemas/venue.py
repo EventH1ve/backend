@@ -25,6 +25,7 @@ class VenueRestriction(BaseModel):
     class Config:
         orm_mode = True
 
+
 class ContactPerson(BaseModel):
     id: Optional[int] = None
     name: str
@@ -32,3 +33,8 @@ class ContactPerson(BaseModel):
 
     class Config:
         orm_mode = True
+
+class VenueContact(BaseModel):
+    id: Optional[int] = None
+    venueid: int
+    contactid: int

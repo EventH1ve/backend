@@ -7,7 +7,7 @@ from models.venue import ContactPerson as ModelContactPerson
 router = APIRouter()
 
 
-@router.post('/contact')
+@router.post('/')
 async def registerContactPerson(contactPerson: ContactPerson):
     contactModel = ModelContactPerson(**contactPerson.dict())
 
