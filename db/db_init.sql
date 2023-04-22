@@ -40,6 +40,10 @@ CREATE TABLE Venue
     capacity    INT,
     description VARCHAR,
     createdBy   VARCHAR,
+    buildingNumber INT,
+    streetName     VARCHAR,
+    city           VARCHAR,
+    country        VARCHAR,
     PRIMARY KEY (id)
 );
 
@@ -82,18 +86,6 @@ CREATE TABLE Attendee
     userID INT,
     PRIMARY KEY (id),
     FOREIGN KEY (userID) REFERENCES Users (id)
-);
-
-CREATE TABLE VenueAddress
-(
-    id             SERIAL,
-    venueID        INT,
-    buildingNumber INT,
-    streetName     VARCHAR,
-    city           VARCHAR,
-    country        VARCHAR,
-    PRIMARY KEY (id),
-    FOREIGN KEY (venueID) REFERENCES Venue (id)
 );
 
 CREATE TABLE Event
