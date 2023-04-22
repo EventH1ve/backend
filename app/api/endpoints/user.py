@@ -4,7 +4,7 @@ from fastapi_sqlalchemy import db
 from models.user import User as ModelUser
 from schemas.user import User, LoginUser
 import bcrypt
-import auth.auth_handler as authHandler
+import lib.auth.auth_handler as authHandler
 
 
 router = APIRouter()

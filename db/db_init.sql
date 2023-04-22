@@ -189,7 +189,7 @@ CREATE TABLE Ticket
     id         SERIAL,
     type       INT,
     eventID    INT,
-    qrCode     INT,
+    qrCode     VARCHAR,
     seatNumber INT,
     PRIMARY KEY (id),
     FOREIGN KEY (type) REFERENCES TicketType (id),
