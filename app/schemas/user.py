@@ -5,9 +5,9 @@ class User(BaseModel):
     username: str
     email: str
     password: str
-    phoneNumber: str
-    firstName: str
-    lastName: str
+    phonenumber: str
+    firstname: str
+    lastname: str
     type: str
 
     class Config:

@@ -1,8 +1,8 @@
 import uvicorn
 import os
 from fastapi import FastAPI
-from fastapi_sqlalchemy import DBSessionMiddleware, db
-from models.user import User as ModelUser
+from fastapi_sqlalchemy import DBSessionMiddleware
+from api.api import api_router
 from dotenv import load_dotenv
 
 load_dotenv('.env')
@@ -17,7 +17,4 @@ def greet():
     return {"success": True}
 
 
-@app.get('/user/')
-async def user():
-    user = db.session.query(ModelUser).all()
-    return user
+app.include_router(api_router)
