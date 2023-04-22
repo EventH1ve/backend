@@ -8,7 +8,9 @@ from schemas.ticket import Ticket
 """
 def generateTicketQR(ticket: Ticket) -> str:
     qrImg = qrcode.make(encodeTicket(ticket))
-    qrImg.save('tmp/' + ticket.qrcode + '.png')
+    qrPath = "'tmp/' + ticket.qrcode + '.png'"
+    qrImg.save(qrPath)
+    return qrPath
 
 
 """
