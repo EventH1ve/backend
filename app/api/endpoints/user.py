@@ -16,9 +16,9 @@ async def user():
     return user
 
 
-@router.get('/signup')
+@router.post('/signup')
 async def signup(user: User):
-    query = db.session.query(ModelUser).filter(User.username == user.username).first()
+    query = db.session.query(ModelUser).filter(ModelUser.username == user.username).first()
     
     if query:
         return {
@@ -26,9 +26,11 @@ async def signup(user: User):
             "message": "Username already exists."
         }
     
-    user.password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt())
+    user.password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-    db.session.add(user)
+    userModel = ModelUser(**user.dict())
+
+    db.session.add(userModel)
     db.session.commit()
 
     return {
@@ -39,7 +41,7 @@ async def signup(user: User):
 
 @router.get('/login')
 async def login(user: LoginUser):
-    query = db.session.query(ModelUser).filter(User.username == user.username).first()
+    query = db.session.query(ModelUser).filter(ModelUser.username == user.username).first()
 
     invalidResponse = {
         "success": False,
