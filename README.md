@@ -27,6 +27,7 @@ uvicorn main:app --reload
 ## Important Notes
 The project will not run properly without the `.env` file with proper environment variables setup.\
 The `.env` file must be located inside the `app` folder, and must contain values for the following variables:
+- PROJECT_ENV (Currently set to `dev`)
 - DATABASE_URL
 - JWT_SECRET
 - JWT_ALGORITHM (Set it to HS256)

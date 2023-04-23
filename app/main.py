@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 
 load_dotenv('.env')
 
+PROJECT_ENV = os.environ['PROJECT_ENV']
+
 app = FastAPI()
 
 app.add_middleware(DBSessionMiddleware, db_url=os.environ['DATABASE_URL'])

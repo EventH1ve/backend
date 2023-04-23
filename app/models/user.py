@@ -15,3 +15,4 @@ class User(Base):
     firstname = Column(String)
     lastname = Column(String)
     type = Column(String)
+    
