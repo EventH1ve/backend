@@ -12,8 +12,8 @@ router = APIRouter()
 
 @router.get('/', response_model=List[User])
 async def user():
-    user = db.session.query(ModelUser).all()
-    return user
+    users = db.session.query(ModelUser).all()
+    return users
 
 
 @router.post('/signup')
