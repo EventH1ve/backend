@@ -27,7 +27,7 @@ async def createVenue(venue: Venue):
     }
 
 
-@router.get('/{venueId}', response_model=List[Venue])
+@router.get('/{venueId}', response_model=Venue)
 async def findVenue(venueId: int):
     venue = db.session.query(ModelVenue).filter(ModelVenue.id == venueId).first()
     return venue if venue else {}
@@ -62,8 +62,6 @@ async def addVenueContact(venueContact: VenueContact):
 @router.get('/contact/{venueId}', response_model=List[ContactPerson])
 async def addVenueContact(venueId: int):
     venueContacts = db.session.query(ModelVenueContact).filter(ModelVenueContact.venueid == venueId).all()
-    contactPersons = db.session.query(ModelContactPerson).filter(ModelContactPerson.id.in_([vc.id for vc in venueContacts])).all()
-    
-    contactPersons = [ContactPerson(**contactPerson.dict()) for contactPerson in contactPersons]
+    contactPersons = db.session.query(ModelContactPerson).filter(ModelContactPerson.id.in_([vc.contactid for vc in venueContacts])).all()
 
     return contactPersons

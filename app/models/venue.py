@@ -12,7 +12,7 @@ class Venue(Base):
     capacity = Column(Integer)
     description = Column(String)
     createdby = Column(String)
-    bulldingnumber = Column(Integer)
+    buildingnumber = Column(Integer)
     streetname = Column(String)
     city = Column(String)
     country = Column(String)
