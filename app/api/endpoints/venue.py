@@ -46,6 +46,12 @@ async def addVenueRestriction(restriction: VenueRestriction):
     }
 
 
+@router.get('/restriction/{venueId}')
+async def getVenueRestrictions(venueId: int):
+    restrictions = db.session.query(ModelVenueRestriction).filter(ModelVenueRestriction.venueid == venueId).all()
+    return restrictions
+
+
 @router.post('/contact')
 async def addVenueContact(venueContact: VenueContact):
     venueContactModel = ModelVenueContact(**venueContact.dict())
