@@ -8,7 +8,7 @@ from app.schemas.user import User, UserCreditCard
 # Fawry endpoint 
 STAGING_ENDPOINT="https://atfawry.fawrystaging.com/ECommerceWeb/Fawry/payments/charge"
 PROD_ENDPOINT="https://www.atfawry.com/ECommerceWeb/Fawry/payments/charge"
-FAWRY_ENDPOINT = PROD_ENDPOINT if PROD_ENDPOINT == "prod" else STAGING_ENDPOINT
+FAWRY_ENDPOINT = PROD_ENDPOINT if PROJECT_ENV == "prod" else STAGING_ENDPOINT
 
 # Merchant info
 MERCHANT_CODE='merchant_code'
