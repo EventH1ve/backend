@@ -13,6 +13,7 @@ psycopg2-binary = "==2.9.6"
 bcrypt = "==4.0.1"
 qrcode = "==7.4.2"
 requests = "==2.28.2"
+alembic = "*"
 
 [dev-packages]
 
