@@ -1,5 +1,6 @@
 from models import Base
 from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 
 class Venue(Base):
@@ -13,6 +14,8 @@ class Venue(Base):
     streetname = Column(String)
     city = Column(String)
     country = Column(String)
+
+    events = relationship("Event", back_populates="venue")
 
   
 class VenueRestriction(Base):

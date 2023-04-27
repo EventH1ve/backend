@@ -14,8 +14,9 @@ class Ticket(BaseModel):
 
 
 class TicketType(BaseModel):
-    id: int
+    id: Optional[int] = None
     eventid: int
+    name: str
     price: int
 
     class Config:

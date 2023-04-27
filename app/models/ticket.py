@@ -1,7 +1,6 @@
 from models import Base
-from sqlalchemy import Column, Integer, ForeignKey, Table
+from sqlalchemy import Column, Integer, ForeignKey, Table, String
 from sqlalchemy.orm import relationship
-
 
 
 eventTicketCapacity = Table(
@@ -29,8 +28,10 @@ class TicketType(Base):
     __tablename__ = 'tickettype'
     id = Column(Integer, primary_key=True, index=True)
     eventid = Column(Integer, ForeignKey("event.id"))
+    name = Column(String)
     price = Column(Integer)
 
     event = relationship("Event", secondary=eventTicketCapacity, back_populates="tickettypes")
     ticket = relationship("Ticket", back_populates="tickettype")
 
+    

@@ -1,8 +1,8 @@
 from models import Base
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from models.ticket import eventTicketCapacity
-
+from sqlalchemy.sql import func
 
 
 class Event(Base):
@@ -12,11 +12,14 @@ class Event(Base):
     description = Column(String)
     type = Column(String)
     status = Column(String)
-    creationdate = Column(DateTime)
-    registrationstartdatetime = Column(DateTime)
-    registrationenddatetime = Column(DateTime)
-    eventstartdatetime = Column(DateTime)
-    eventenddatetime = Column(DateTime)
+    creationdate = Column(DateTime, server_default=func.now())
+    registrationstartdatetime = Column(String)
+    registrationenddatetime = Column(String)
+    eventstartdatetime = Column(String)
+    eventenddatetime = Column(String)
+    venueid = Column(Integer, ForeignKey("venue.id"))
+    profile = Column(String)
 
     tickets = relationship("Ticket", back_populates="event")
     tickettypes = relationship("TicketType", secondary=eventTicketCapacity, back_populates="event")
+    venue = relationship("Venue", back_populates="events")
