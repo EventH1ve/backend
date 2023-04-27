@@ -1,6 +1,6 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
-
+from schemas.ticket import TicketType
 
 class Event(BaseModel):
     id: Optional[int] = None
@@ -20,13 +20,24 @@ class Event(BaseModel):
         orm_mode = True
 
 
-class ClientEvent(BaseModel):
+class ListEvent(BaseModel):
     id: int
     name: str
     venue: str
     date: str
     price: str
     profile: str
+
+    class Config:
+        orm_mode = True
+
+
+class SingleEvent(BaseModel):
+    name: str
+    venue: str
+    date: str
+    profile: str
+    tickettypes: List[TicketType]
 
     class Config:
         orm_mode = True
