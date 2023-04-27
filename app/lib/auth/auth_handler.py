@@ -19,7 +19,7 @@ def sign(userId: str) -> str:
         "expires": time.time() + 600
     }
     
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM).decode("utf-8")
 
     return str(token)
 
@@ -34,6 +34,7 @@ def verify(token: str) -> str:
     try:
         decodedToken = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return str(decodedToken) if decodedToken["expires"] >= time.time() else None
-    except:
+    except Exception as e:
+        print(e)
         return ""
     

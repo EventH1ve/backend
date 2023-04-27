@@ -1,8 +1,5 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-
-
-Base = declarative_base()
+from models import Base
+from sqlalchemy import Column, Integer, String, ForeignKey
 
 
 class Venue(Base):
@@ -21,15 +18,15 @@ class Venue(Base):
 class VenueRestriction(Base):
     __tablename__ = 'venuerestriction'
     id = Column(Integer, primary_key=True, index=True)
-    venueid = Column(Integer)
+    venueid = Column(Integer, ForeignKey("venue.id"))
     restriction = Column(String)  
 
 
 class VenueContact(Base):
     __tablename__ = 'venuecontact'
     id = Column(Integer, primary_key=True, index=True)
-    venueid = Column(Integer)
-    contactid = Column(Integer)
+    venueid = Column(Integer, ForeignKey("venue.id"))
+    contactid = Column(Integer, ForeignKey("contactperson.id"))
 
 
 class ContactPerson(Base):
