@@ -23,6 +23,10 @@ Database migrations must then be run using (make sure to have a database by the 
 ```bash
 alembic upgrade head
 ```
+Note: during development, changes to the database must be reflected in the register.py file within the models folder and then the following command must be run to commit the changes:
+```bash
+alembic revision --autogenerate -m "Commit Message"
+```
 The project can then be launched using uvicorn:
 ```bash
 uvicorn main:app --reload
