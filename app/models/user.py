@@ -1,5 +1,6 @@
 from models import Base
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -13,3 +14,4 @@ class User(Base):
     lastname = Column(String)
     type = Column(String)
     
+    bookings = relationship("UserEventBooking", back_populates="users")
