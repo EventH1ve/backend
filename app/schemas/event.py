@@ -1,4 +1,5 @@
 from typing import Optional, List
+from datetime import datetime
 from pydantic import BaseModel
 from schemas.ticket import TicketType
 
@@ -18,6 +19,15 @@ class Event(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserEventBooking(BaseModel):
+    id: Optional[int] = None
+    userid: int
+    eventid: int
+    bookingdate: datetime
+    price: float
+    transactionid: str
 
 
 class ListEvent(BaseModel):

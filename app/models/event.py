@@ -1,5 +1,5 @@
 from models import Base
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float
 from sqlalchemy.orm import relationship
 from models.ticket import eventTicketCapacity
 from sqlalchemy.sql import func
@@ -24,13 +24,14 @@ class Event(Base):
     tickettypes = relationship("TicketType", secondary=eventTicketCapacity, back_populates="event")
     venue = relationship("Venue", back_populates="events")
 
+
 class UserEventBooking(Base):
     __tablename__ = 'usereventbooking'
     id = Column(Integer, primary_key=True, index=True)
     userid = Column(Integer, ForeignKey("users.id"))
     eventid = Column(Integer, ForeignKey("event.id"))
     bookingdate = Column(DateTime, server_default=func.now())
-    price = Column(Integer)
+    price = Column(Float)
     transactionid = Column(String)
 
     users = relationship("User", back_populates="bookings")
