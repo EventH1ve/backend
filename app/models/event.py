@@ -27,7 +27,7 @@ class Event(Base):
 class UserEventBooking(Base):
     __tablename__ = 'usereventbooking'
     id = Column(Integer, primary_key=True, index=True)
-    userid = Column(Integer, ForeignKey("venue.id"))
+    userid = Column(Integer, ForeignKey("users.id"))
     eventid = Column(Integer, ForeignKey("event.id"))
     bookingdate = Column(DateTime, server_default=func.now())
     price = Column(Integer)
