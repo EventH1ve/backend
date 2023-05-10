@@ -26,15 +26,14 @@ def sign(userId: str) -> str:
 
 """
     Verifies the provided JWT token.
-    Returns the token if token is valid
-    Returns None if token is invalid
-    Returns an empty string in the case of an error
+    Returns true if token is valid
+    Returns false if token is invalid
 """
-def verify(token: str) -> str:
+def verify(token: str) -> bool:
     try:
         decodedToken = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        return str(decodedToken) if decodedToken["expires"] >= time.time() else None
+        return True if decodedToken["expires"] >= time.time() else False
     except Exception as e:
         print(e)
-        return ""
+        return False
     

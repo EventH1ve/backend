@@ -63,14 +63,13 @@ async def login(user: LoginUser):
 
 @router.get('/verifyToken')
 async def verifyToken(token: str):
-    res = authHandler.verify(token)
 
     invalidResponse = {
         "success": False,
         "message": "Invalid token."
     }
 
-    if not res or res == "":
+    if not authHandler.verify(token):
         return invalidResponse
     
     return {
