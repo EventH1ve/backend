@@ -1,7 +1,8 @@
-from fastapi import Request, HTTPException
+from typing import Annotated
+from fastapi import Request, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from lib.auth.auth_handler import verify
+from lib.auth.auth_handler import verify, decodeToken
 
 
 class JWTBearer(HTTPBearer):
@@ -21,3 +22,8 @@ class JWTBearer(HTTPBearer):
 
     def checkJWT(self, jwtoken: str) -> bool:
         return verify(jwtoken)
+    
+
+async def getCurrentUserId(token: Annotated[str, Depends(JWTBearer())]):
+    userId = decodeToken(token)
+    return userId

@@ -37,3 +37,14 @@ def verify(token: str) -> bool:
         print(e)
         return False
     
+
+"""
+    Decodes the specified JWT token.
+    Returns the user id if the token is valid, -1 otherwise. 
+"""
+def decodeToken(token: str) -> int:
+    try:
+        decodedToken = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return decodedToken["user_id"]
+    except Exception as e:
+        return -1
