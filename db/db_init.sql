@@ -1,7 +1,6 @@
 CREATE TABLE Users
 (
     id          SERIAL,
-    username    VARCHAR,
     email       VARCHAR,
     password    VARCHAR,
     phoneNumber VARCHAR,
@@ -88,13 +87,14 @@ CREATE TABLE Attendee
     FOREIGN KEY (userID) REFERENCES Users (id)
 );
 
-CREATE TABLE Event
+CREATE TABLE Events
 (
     id                        SERIAL,
     name                      VARCHAR,
     description               VARCHAR,
     type                      INT,
     status                    INT,
+	avgRating 				  INT,
     creationDate              DATE,
     registrationStartDateTime TIMESTAMP,
     registrationEndDateTime   TIMESTAMP,
@@ -110,9 +110,11 @@ CREATE TABLE EventFeedback
     id      SERIAL,
     userID  INT,
     eventID INT,
+    feedbackRating     INT,
+    feedbackDescription VARCHAR,
     PRIMARY KEY (id),
     FOREIGN KEY (userID) REFERENCES Attendee (id),
-    FOREIGN KEY (eventID) REFERENCES Event (id)
+    FOREIGN KEY (eventID) REFERENCES Events (id)
 );
 
 CREATE TABLE OrganizationAddress
@@ -145,7 +147,7 @@ CREATE TABLE Post
     title       VARCHAR,
     description VARCHAR,
     PRIMARY KEY (id),
-    FOREIGN KEY (eventID) REFERENCES Event (id),
+    FOREIGN KEY (eventID) REFERENCES Events (id),
     FOREIGN KEY (userID) REFERENCES Administrator (id)
 );
 
@@ -173,7 +175,7 @@ CREATE TABLE TicketType
     eventID INT,
     price   INT,
     PRIMARY KEY (id),
-    FOREIGN KEY (eventID) REFERENCES Event (id)
+    FOREIGN KEY (eventID) REFERENCES Events (id)
 );
 
 CREATE TABLE Ticket
@@ -185,7 +187,7 @@ CREATE TABLE Ticket
     seatNumber INT,
     PRIMARY KEY (id),
     FOREIGN KEY (type) REFERENCES TicketType (id),
-    FOREIGN KEY (eventID) REFERENCES Event (id)
+    FOREIGN KEY (eventID) REFERENCES Events (id)
 );
 
 CREATE TABLE EventVenue
@@ -194,7 +196,7 @@ CREATE TABLE EventVenue
     eventID INT,
     venueID INT,
     PRIMARY KEY (id),
-    FOREIGN KEY (eventID) REFERENCES Event (id),
+    FOREIGN KEY (eventID) REFERENCES Events (id),
     FOREIGN KEY (venueID) REFERENCES Venue (id)
 );
 
@@ -206,10 +208,10 @@ CREATE TABLE TicketTypeEventSeat
     seatNumber   INT,
     PRIMARY KEY (id),
     FOREIGN KEY (ticketTypeID) REFERENCES TicketType (id),
-    FOREIGN KEY (eventID) REFERENCES Event (id)
+    FOREIGN KEY (eventID) REFERENCES Events (id)
 );
 
-CREATE TABLE Transaction
+CREATE TABLE Transactions
 (
     id            SERIAL,
     userID        INT,
@@ -227,7 +229,7 @@ CREATE TABLE EventHost
     eventID INT,
     PRIMARY KEY (id),
     FOREIGN KEY (hostID) REFERENCES Organization (id),
-    FOREIGN KEY (eventID) REFERENCES Event (id)
+    FOREIGN KEY (eventID) REFERENCES Events (id)
 );
 
 CREATE TABLE VenueContact
@@ -246,18 +248,8 @@ CREATE TABLE EventTicketCapacity
     eventID    INT,
     ticketType INT,
     capacity   INT,
-    reserved   INT,
+    reservedAmount   INT,
     PRIMARY KEY (id),
     FOREIGN KEY (ticketType) REFERENCES TicketType (id),
-    FOREIGN KEY (eventID) REFERENCES Event (id)
+    FOREIGN KEY (eventID) REFERENCES Events (id)
 );
-
-CREATE TABLE EventRating
-(
-    id         SERIAL,
-    rating     INT,
-    feedbackID INT,
-    PRIMARY KEY (id),
-    FOREIGN KEY (feedbackID) REFERENCES EventFeedback (id)
-);
-
