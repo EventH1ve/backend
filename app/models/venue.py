@@ -15,8 +15,6 @@ class Venue(Base):
     city = Column(String)
     country = Column(String)
 
-    events = relationship("Event", back_populates="venue")
-
   
 class VenueRestriction(Base):
     __tablename__ = 'venuerestriction'

@@ -10,19 +10,18 @@ class Event(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     description = Column(String)
+    venue = Column(String)
     type = Column(String)
     status = Column(String)
     creationdate = Column(DateTime, server_default=func.now())
-    registrationstartdatetime = Column(String)
-    registrationenddatetime = Column(String)
-    eventstartdatetime = Column(String)
-    eventenddatetime = Column(String)
-    venueid = Column(Integer, ForeignKey("venue.id"))
+    registrationstartdatetime = Column(DateTime)
+    registrationenddatetime = Column(DateTime)
+    eventstartdatetime = Column(DateTime)
+    eventenddatetime = Column(DateTime)
     profile = Column(String)
 
     tickets = relationship("Ticket", back_populates="event")
     tickettypes = relationship("TicketType", secondary=eventTicketCapacity, back_populates="event")
-    venue = relationship("Venue", back_populates="events")
 
 
 class UserEventBooking(Base):

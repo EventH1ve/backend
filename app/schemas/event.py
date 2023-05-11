@@ -7,14 +7,14 @@ class Event(BaseModel):
     id: Optional[int] = None
     name: str
     description: str
+    venue: str
     type: str
     status: str
-    creationdate: Optional[str]
-    registrationstartdatetime = str
-    registrationenddatetime = str
-    eventstartdatetime = str
-    eventenddatetime = str
-    venueid: int
+    creationdate: Optional[datetime]
+    registrationstartdatetime: datetime
+    registrationenddatetime: datetime
+    eventstartdatetime: datetime
+    eventenddatetime: datetime
     profile: str
 
     class Config:
@@ -53,6 +53,11 @@ class SingleEvent(BaseModel):
         orm_mode = True
 
 
-class LoginUser(BaseModel):
-    username: str
-    password: str
+class DashboardEvent(BaseModel):
+    id: Optional[int] = None
+    name: str
+    venue: str
+    date: datetime
+    price: float
+    status: Optional[str] = "Paid"
+    transactionId: str
