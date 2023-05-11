@@ -12,7 +12,7 @@ class User(BaseModel):
     firstname: str
     lastname: str
     type: str
-    createdat: datetime
+    createdat: Optional[datetime]
 
     class Config:
         orm_mode = True

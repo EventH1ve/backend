@@ -60,4 +60,7 @@ class DashboardEvent(BaseModel):
     date: datetime
     price: float
     status: Optional[str] = "Paid"
-    transactionId: str
+    transactionid: str
+
+    class Config:
+        orm_mode = True
