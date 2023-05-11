@@ -1,6 +1,7 @@
 CREATE TABLE Users
 (
     id          SERIAL,
+    username    VARCHAR,
     email       VARCHAR,
     password    VARCHAR,
     phoneNumber VARCHAR,
