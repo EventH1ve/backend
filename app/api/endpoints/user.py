@@ -57,7 +57,7 @@ async def login(user: LoginUser):
     return {
         "success": True,
         "message": "Login successful.",
-        "accessToken": authHandler.sign(query.id)
+        "token": authHandler.sign(query.id)
     }
 
 
