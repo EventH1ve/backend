@@ -39,7 +39,7 @@ async def signup(user: User):
     }
 
 
-@router.get('/login')
+@router.post('/login')
 async def login(user: LoginUser):
     query = db.session.query(ModelUser).filter(ModelUser.username == user.username).first()
 
@@ -61,7 +61,7 @@ async def login(user: LoginUser):
     }
 
 
-@router.get('/verifyToken')
+@router.post('/verifyToken')
 async def verifyToken(token: str):
 
     invalidResponse = {

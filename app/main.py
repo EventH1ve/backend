@@ -2,6 +2,7 @@ import uvicorn
 import os
 from fastapi import FastAPI
 from fastapi_sqlalchemy import DBSessionMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from api.api import api_router
 from dotenv import load_dotenv
 
@@ -13,6 +14,15 @@ app = FastAPI()
 
 app.add_middleware(DBSessionMiddleware, db_url=os.environ['DATABASE_URL'])
 
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/", tags=["home"])
 def greet():
