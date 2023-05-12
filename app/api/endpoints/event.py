@@ -3,7 +3,6 @@ from fastapi import APIRouter
 from fastapi_sqlalchemy import db
 from sqlalchemy import func
 from models.event import Event as ModelEvent
-from models.venue import Venue as ModelVenue
 from models.ticket import TicketType as ModelTicketType
 from schemas.event import Event, ListEvent, SingleEvent
 
@@ -16,24 +15,24 @@ async def listEvents(skip: int = 0, limit: int = 10):
     events = db.session.query(ModelEvent).with_entities(
         ModelEvent.id,
         ModelEvent.name,
-        ModelVenue.name.label("venue"),
+        ModelEvent.venue,
         ModelEvent.eventstartdatetime.label("date"),
         func.min(ModelTicketType.price).label("price"),
         ModelEvent.profile,
-    ).join(ModelVenue).join(ModelTicketType).group_by(ModelEvent.id, ModelVenue.name).all()
+    ).join(ModelTicketType, isouter=True).group_by(ModelEvent.id).offset(skip).limit(limit).all()
     return events
 
 
 @router.get('/{id}', response_model=List[SingleEvent])
-async def findEvent(id: int, skip: int = 0, limit: int = 10):
+async def findEvent(id: int):
     events = []
     for event in db.session.query(ModelEvent).with_entities(
         ModelEvent.id,
         ModelEvent.name,
-        ModelVenue.name.label("venue"),
+        ModelEvent.venue,
         ModelEvent.eventstartdatetime.label("date"),
         ModelEvent.profile,
-    ).join(ModelVenue).group_by(ModelEvent.id, ModelVenue.name).all():
+    ).filter(ModelEvent.id == id).all():
         types = db.session.query(ModelTicketType).filter(ModelTicketType.eventid == event.id).all()
         eventDict = {
             "name": event.name,

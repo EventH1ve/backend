@@ -35,7 +35,7 @@ class ListEvent(BaseModel):
     name: str
     venue: str
     date: datetime
-    price: str
+    price: Optional[int] = 0
     profile: str
 
     class Config:
