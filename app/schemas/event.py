@@ -34,7 +34,7 @@ class ListEvent(BaseModel):
     id: int
     name: str
     venue: str
-    date: str
+    date: datetime
     price: str
     profile: str
 
@@ -45,7 +45,7 @@ class ListEvent(BaseModel):
 class SingleEvent(BaseModel):
     name: str
     venue: str
-    date: str
+    date: datetime
     profile: str
     tickettypes: List[TicketType]
 
