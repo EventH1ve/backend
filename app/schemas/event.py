@@ -64,3 +64,10 @@ class DashboardEvent(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class EventSeatLayout(BaseModel):
+    id: Optional[int] = None
+    eventid: int
+    row: str
+    seats: List[int]

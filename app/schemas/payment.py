@@ -7,6 +7,7 @@ class PaymentInfo(BaseModel):
     eventId: int
     orderId: str
     subtotal: float
+    ticketType: str
 
     class Config:
         orm_mode = True
