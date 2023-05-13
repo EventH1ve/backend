@@ -33,5 +33,6 @@ class TicketType(Base):
 
     event = relationship("Event", secondary=eventTicketCapacity, back_populates="tickettypes")
     ticket = relationship("Ticket", back_populates="tickettype")
+    seats = relationship("EventSeatLayout", back_populates="tickettype")
 
     

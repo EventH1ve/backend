@@ -71,3 +71,13 @@ class EventSeatLayout(BaseModel):
     eventid: int
     row: str
     seats: List[int]
+
+
+class ReceivedEvent(BaseModel):
+    name: str
+    cover: str
+    date: str
+    description: str
+    time: str
+    venue: str
+    tickets: List[dict]

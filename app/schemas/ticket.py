@@ -22,3 +22,7 @@ class TicketType(BaseModel):
     class Config:
         orm_mode = True
 
+
+class ReceievedTicketType(BaseModel):
+    name: str
+    type
