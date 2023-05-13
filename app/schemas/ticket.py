@@ -25,4 +25,6 @@ class TicketType(BaseModel):
 
 class ReceievedTicketType(BaseModel):
     name: str
-    type
+    price: float
+    available: bool
+    seated: bool

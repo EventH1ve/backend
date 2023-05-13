@@ -29,6 +29,9 @@ class UserEventBooking(BaseModel):
     price: float
     transactionid: str
 
+    class Config:
+        orm_mode = True
+
 
 class ListEvent(BaseModel):
     id: int
