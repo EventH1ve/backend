@@ -38,15 +38,4 @@ class UserEventBooking(Base):
 
     users = relationship("User", back_populates="bookings")
 
-
-class EventSeatLayout(Base):
-    __tablename__ = 'eventseatlayout'
-    id = Column(Integer, primary_key=True, index=True)
-    eventid = Column(Integer, ForeignKey("event.id"))
-    ticketypeid = Column(Integer, ForeignKey("tickettype.id"))
-    row = Column(String)
-    seats = Column(ARRAY(Integer))
-
-    event = relationship("Event", back_populates="seats")
-    tickettype = relationship("TicketType", back_populates="seats")
     

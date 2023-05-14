@@ -70,20 +70,3 @@ class DashboardEvent(BaseModel):
 
     class Config:
         orm_mode = True
-
-
-class EventSeatLayout(BaseModel):
-    id: Optional[int] = None
-    eventid: int
-    row: str
-    seats: List[int]
-
-
-class ReceivedEvent(BaseModel):
-    name: str
-    cover: str
-    date: str
-    description: str
-    time: str
-    venue: str
-    tickets: List[dict]
