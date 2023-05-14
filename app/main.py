@@ -14,7 +14,7 @@ app = FastAPI()
 
 app.add_middleware(DBSessionMiddleware, db_url=os.environ['DATABASE_URL'])
 
-@app.middleware("http")
+@app.middleware("http") #question
 async def add_process_time_header(request: Request, call_next):
     print(request.method, request.url)
     response = await call_next(request)
