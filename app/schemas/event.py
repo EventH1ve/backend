@@ -2,6 +2,7 @@ from typing import Optional, List
 from datetime import datetime
 from pydantic import BaseModel
 from schemas.ticket import TicketType
+from uuid import UUID
 
 class Event(BaseModel):
     id: Optional[int] = None
@@ -22,7 +23,7 @@ class Event(BaseModel):
 
 
 class UserEventBooking(BaseModel):
-    id: Optional[int] = None
+    id: Optional[UUID] = None
     userid: int
     eventid: int
     bookingdate: datetime
