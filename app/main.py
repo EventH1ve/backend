@@ -21,7 +21,8 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
-origins = ["http://localhost:3000"]
+origins = ["http://localhost", "http://localhost:3000"]
+
 
 app.add_middleware(
     CORSMiddleware,
