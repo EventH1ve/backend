@@ -37,7 +37,7 @@ async def signup(user: User):
     db.session.add(userModel)
     db.session.commit()
     
-    if user.type == "admin":
+    if user.type.lower() == "admin":
         adminModel = ModelAdmin(userid=userModel.id)
         db.session.add(adminModel)
         db.session.commit()
