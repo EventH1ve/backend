@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Json
 
 
 class Ticket(BaseModel):
@@ -18,6 +18,10 @@ class TicketType(BaseModel):
     eventid: int
     name: str
     price: int
+    limit: int
+    seated: bool
+    seats: Json
+
 
     class Config:
         orm_mode = True
