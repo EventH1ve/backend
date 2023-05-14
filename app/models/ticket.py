@@ -1,5 +1,5 @@
 from models import Base
-from sqlalchemy import Column, Integer, ForeignKey, Table, String
+from sqlalchemy import Column, Integer, ForeignKey, Table, String, Boolean , JSON
 from sqlalchemy.orm import relationship
 
 
@@ -30,6 +30,9 @@ class TicketType(Base):
     eventid = Column(Integer, ForeignKey("event.id"))
     name = Column(String)
     price = Column(Integer)
+    limit = Column(Integer)
+    seated = Column(Boolean)
+    seats = Column(JSON)
 
     event = relationship("Event", secondary=eventTicketCapacity, back_populates="tickettypes")
     ticket = relationship("Ticket", back_populates="tickettype")
