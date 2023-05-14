@@ -31,9 +31,6 @@ async def signup(user: User):
 
     userModel = ModelUser(**user.dict())
 
-
-    # check if the type == admin do a query to add that user id in admin Table
-
     db.session.add(userModel)
     db.session.commit()
     

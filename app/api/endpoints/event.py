@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Annotated
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi_sqlalchemy import db
@@ -5,7 +6,7 @@ from sqlalchemy import func
 from models.user import User as ModelUser
 from models.event import Event as ModelEvent
 from models.ticket import TicketType as ModelTicketType
-from schemas.event import Event, ListEvent, SingleEvent
+from schemas.event import Event, ListEvent, SingleEvent, MobileEvent
 from lib.auth.jwt_bearer import getCurrentUserId
 
 
@@ -22,6 +23,39 @@ async def listEvents(skip: int = 0, limit: int = 10):
         func.min(ModelTicketType.price).label("price"),
         ModelEvent.profile,
     ).join(ModelTicketType, isouter=True).group_by(ModelEvent.id).offset(skip).limit(limit).all()
+    return events
+
+
+@router.get('/app', response_model=List[MobileEvent])
+async def findEventByAdmin(userId: Annotated[int, Depends(getCurrentUserId)], skip: int = 0, limit: int = 10):
+    events = []
+    now = datetime.now().date()
+    for event in db.session.query(ModelEvent).with_entities(
+        ModelEvent.id,
+        ModelEvent.name,
+        ModelEvent.description,
+        ModelEvent.adminid,
+        ModelEvent.venue,
+        ModelEvent.eventstartdatetime.label("date"),
+        func.min(ModelTicketType.price).label("price"),
+        ModelEvent.profile,
+    ).filter(ModelEvent.adminid == userId).join(ModelTicketType, isouter=True).group_by(ModelEvent.id).offset(skip).limit(limit).all():
+        eventstartdatetime = event.date
+        isEnabled = True if eventstartdatetime.date() == now else False
+        types = db.session.query(ModelTicketType).filter(ModelTicketType.eventid == event.id).all()
+
+        eventDict = {
+            "id": event.id,
+            "name": event.name,
+            "venue": event.venue,
+            "date": event.date,
+            "price": event.price,
+            "profile": event.profile,
+            "isEnabled": isEnabled,
+            "tickettypes": types
+        }
+        singleEvent = MobileEvent.parse_obj(eventDict)
+        events.append(singleEvent)
     return events
 
 
@@ -70,3 +104,5 @@ async def createEvent(event: Event, userId: Annotated[int, Depends(getCurrentUse
         "success": True,
         "message": "Event created."
     }
+
+
