@@ -23,6 +23,9 @@ class Event(Base):
     eventstartdatetime = Column(DateTime, nullable=True)
     eventenddatetime = Column(DateTime, nullable=True)
 
+    admin_id = Column(Integer, ForeignKey('users.id'))
+    admin = relationship("User", back_populates="event")  
+
     tickets = relationship("Ticket", back_populates="event")
     tickettypes = relationship("TicketType", secondary=eventTicketCapacity, back_populates="event")
 

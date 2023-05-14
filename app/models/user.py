@@ -18,3 +18,4 @@ class User(Base):
     createdat = Column(DateTime, server_default=func.now())
 
     bookings = relationship("UserEventBooking", back_populates="users")
+    events = relationship("Event", back_populates="users")
