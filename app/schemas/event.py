@@ -30,6 +30,7 @@ class UserEventBooking(BaseModel):
     bookingdate: datetime
     price: float
     transactionid: str
+    tickettype: str
 
     class Config:
         orm_mode = True

@@ -30,25 +30,31 @@ async def createPaymentEntry(paymentInfo: PaymentInfo, userId: Annotated[int, De
     if entry:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Transaction already recorded.')
     
-    entryModel = ModelUserEventBooking(**{'userid': userId, 'eventid': paymentInfo.eventId, 'price': paymentInfo.subtotal, 'transactionid': paymentInfo.orderId})
+    ticketLinks = list()
 
-    db.session.add(entryModel)
-    db.session.commit()
+    print(len(paymentInfo.tickets))
 
+    for order in paymentInfo.tickets:
+        for _ in range(order['count']):
+            entryModel = ModelUserEventBooking(**{'userid': userId, 'eventid': paymentInfo.eventId, 'price': paymentInfo.subtotal, 'transactionid': paymentInfo.orderId, 'tickettype': order['ticket_type']})
 
-    qrURL = generateTicketQR(entryModel.id)
+            db.session.add(entryModel)
+            db.session.commit()
 
-    userPhoneNumber = (db.session.query(ModelUser)
-                       .with_entities(ModelUser.phonenumber)
-                       .filter(ModelUser.id == userId).first())
+            qrURL = generateTicketQR(entryModel.id)
+            ticketLinks.append(qrURL)
 
-    twilioClient.messages.create(
-        to=f"whatsapp:+2{userPhoneNumber[0]}",
-        from_="whatsapp:+14155238886",
-        body=f'Thank you for using EventHive!\n\nYour order ID is {paymentInfo.orderId}\n\nYour ticket\'s QR Code can be accessed on the following link: {qrURL}\n\nEnjoy your event!')
+            userPhoneNumber = (db.session.query(ModelUser)
+                            .with_entities(ModelUser.phonenumber)
+                            .filter(ModelUser.id == userId).first())
+
+            twilioClient.messages.create(
+                to=f"whatsapp:+2{userPhoneNumber[0]}",
+                from_="whatsapp:+14155238886",
+                body=f'Thank you for using EventHive!\n\nYour order ID is {paymentInfo.orderId}\n\nYour ticket\'s QR Code can be accessed on the following link: {qrURL}\n\nEnjoy your event!')
 
     return {
-        "qrURL": qrURL
+        "qrURL": ticketLinks
     }
 
 
