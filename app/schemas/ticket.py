@@ -1,5 +1,5 @@
-from typing import Optional
-from pydantic import BaseModel, Json
+from typing import Dict, List, Optional
+from pydantic import BaseModel
 
 
 class Ticket(BaseModel):
@@ -20,7 +20,7 @@ class TicketType(BaseModel):
     price: int
     limit: int
     seated: bool
-    seats: Json
+    seats: Dict[str, List[int]]
 
 
     class Config:

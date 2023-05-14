@@ -10,7 +10,8 @@ class Event(BaseModel):
     datetime: datetime
     description: str
     venue: str
-
+    ticketTypes: List[TicketType]
+    
     creationdate: Optional[datetime]
     type: Optional[str]
     status: Optional[str]

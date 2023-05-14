@@ -48,9 +48,19 @@ async def findEvent(id: int):
 
 @router.post('/')
 async def createEvent(event: Event):
-    eventModel = ModelEvent(**event.dict())
 
-    db.session.add(eventModel)
+    event_data = event.dict(exclude={"ticketTypes"})
+    createdEvent = ModelEvent(**event_data)
+    db.session.add(createdEvent)
+    db.session.commit()
+
+
+    for ticket_type in event.ticketTypes:
+        ticket_type_data = ticket_type.dict()
+        ticket_type_data["eventid"] = createdEvent.id  
+        createdTicketType = ModelTicketType(**ticket_type_data)
+        db.session.add(createdTicketType)
+
     db.session.commit()
 
     return {
