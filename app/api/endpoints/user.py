@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from fastapi_sqlalchemy import db
 from models.user import User as ModelUser
 from schemas.user import User, LoginUser
+from models.admin import Admin as ModelAdmin
 import bcrypt
 import lib.auth.auth_handler as authHandler
 
@@ -30,8 +31,16 @@ async def signup(user: User):
 
     userModel = ModelUser(**user.dict())
 
+
+    # check if the type == admin do a query to add that user id in admin Table
+
     db.session.add(userModel)
     db.session.commit()
+    
+    if user.type == "admin":
+        adminModel = ModelAdmin(userid=userModel.id)
+        db.session.add(adminModel)
+        db.session.commit()
 
     return {
         "success": True,

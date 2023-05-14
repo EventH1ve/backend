@@ -37,17 +37,38 @@ class ListEvent(BaseModel):
     date: datetime
     price: Optional[int] = 0
     profile: str
+    
 
     class Config:
         orm_mode = True
 
 
+class MobileEvent(BaseModel):
+    id: int
+    name: str
+    venue: str
+    date: datetime
+    price: Optional[int] = 0
+    profile: str
+    isEnabled:str
+    tickettypes: List[TicketType]
+
+    
+
+    class Config:
+        orm_mode = True
+
+    
+
+    
 class SingleEvent(BaseModel):
     name: str
     venue: str
     date: datetime
-    profile: str
+    cover: str  # change "profile" to "cover"
     tickettypes: List[TicketType]
+    description:str
+
 
     class Config:
         orm_mode = True

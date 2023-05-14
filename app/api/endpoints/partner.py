@@ -12,5 +12,5 @@ async def listEvents(skip: int = 0, limit: int = 10):
         ModelPartner.id,
         ModelPartner.name,
         ModelPartner.img
-    ).all(  )
+    ).all()
     return partners

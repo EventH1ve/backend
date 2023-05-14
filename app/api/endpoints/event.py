@@ -22,6 +22,7 @@ async def listEvents(skip: int = 0, limit: int = 10):
     ).join(ModelTicketType, isouter=True).group_by(ModelEvent.id).offset(skip).limit(limit).all()
     return events
 
+# 
 
 @router.get('/{id}', response_model=List[SingleEvent])
 async def findEvent(id: int):
@@ -29,6 +30,7 @@ async def findEvent(id: int):
     for event in db.session.query(ModelEvent).with_entities(
         ModelEvent.id,
         ModelEvent.name,
+        ModelEvent.description,
         ModelEvent.venue,
         ModelEvent.eventstartdatetime.label("date"),
         ModelEvent.profile,
@@ -36,9 +38,10 @@ async def findEvent(id: int):
         types = db.session.query(ModelTicketType).filter(ModelTicketType.eventid == event.id).all()
         eventDict = {
             "name": event.name,
+            "description":event.description,
             "venue": event.venue,
             "date": event.date,
-            "profile": event.profile,
+            "cover": event.profile,
             "tickettypes": types
         }
         singleEvent = SingleEvent.parse_obj(eventDict)
