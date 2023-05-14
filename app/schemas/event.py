@@ -6,16 +6,19 @@ from schemas.ticket import TicketType
 class Event(BaseModel):
     id: Optional[int] = None
     name: str
+    coverImage: str
+    datetime: datetime
     description: str
     venue: str
-    type: str
-    status: str
+
     creationdate: Optional[datetime]
-    registrationstartdatetime: datetime
-    registrationenddatetime: datetime
-    eventstartdatetime: datetime
-    eventenddatetime: datetime
-    profile: str
+    type: Optional[str]
+    status: Optional[str]
+    registrationstartdatetime: Optional[datetime]
+    registrationenddatetime: Optional[datetime]
+    eventstartdatetime: Optional[datetime]
+    eventenddatetime: Optional[datetime]
+
 
     class Config:
         orm_mode = True
