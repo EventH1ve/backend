@@ -1,10 +1,12 @@
-from typing import List
-from fastapi import APIRouter
+from typing import List, Annotated
+from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi_sqlalchemy import db
 from sqlalchemy import func
+from models.user import User as ModelUser
 from models.event import Event as ModelEvent
 from models.ticket import TicketType as ModelTicketType
 from schemas.event import Event, ListEvent, SingleEvent
+from lib.auth.jwt_bearer import getCurrentUserId
 
 
 router = APIRouter()
@@ -22,7 +24,6 @@ async def listEvents(skip: int = 0, limit: int = 10):
     ).join(ModelTicketType, isouter=True).group_by(ModelEvent.id).offset(skip).limit(limit).all()
     return events
 
-# 
 
 @router.get('/{id}', response_model=List[SingleEvent])
 async def findEvent(id: int):
@@ -50,7 +51,16 @@ async def findEvent(id: int):
 
 
 @router.post('/')
-async def createEvent(event: Event):
+async def createEvent(event: Event, userId: Annotated[int, Depends(getCurrentUserId)]):
+    userType = (db.session.query(ModelUser)
+            .with_entities(ModelUser.type)
+            .filter(ModelUser.id == userId).first())
+    
+    if userType[0].lower() != 'admin':
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User is not an Admin.')
+
+    event.adminid = userId
+
     eventModel = ModelEvent(**event.dict())
 
     db.session.add(eventModel)

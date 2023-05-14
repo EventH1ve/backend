@@ -1,5 +1,4 @@
 .env
 Pipfile.lock 
 tmp
-app/alembic/*
 __pycache__

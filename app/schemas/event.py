@@ -16,6 +16,7 @@ class Event(BaseModel):
     eventstartdatetime: datetime
     eventenddatetime: datetime
     profile: str
+    adminid: Optional[int]
 
     class Config:
         orm_mode = True
