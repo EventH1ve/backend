@@ -1,9 +1,10 @@
 from models import Base
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import relationship
 from models.ticket import eventTicketCapacity
 from sqlalchemy.sql import func
+import uuid
 
 
 class Event(Base):
@@ -28,7 +29,7 @@ class Event(Base):
 
 class UserEventBooking(Base):
     __tablename__ = 'usereventbooking'
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     userid = Column(Integer, ForeignKey("users.id"))
     eventid = Column(Integer, ForeignKey("event.id"))
     bookingdate = Column(DateTime, server_default=func.now())

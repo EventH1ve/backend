@@ -35,7 +35,8 @@ async def createPaymentEntry(paymentInfo: PaymentInfo, userId: Annotated[int, De
     db.session.add(entryModel)
     db.session.commit()
 
-    qrURL = generateTicketQR(userId, paymentInfo)
+
+    qrURL = generateTicketQR(entryModel.id)
 
     userPhoneNumber = (db.session.query(ModelUser)
                        .with_entities(ModelUser.phonenumber)

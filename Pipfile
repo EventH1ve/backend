@@ -16,6 +16,7 @@ requests = "==2.28.2"
 alembic = "*"
 cloudinary = "*"
 twilio = "*"
+uuid = "*"
 
 [dev-packages]
 
