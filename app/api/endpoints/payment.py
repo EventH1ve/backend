@@ -7,9 +7,19 @@ from schemas.payment import PaymentInfo
 from schemas.event import ReceivedEvent, UserEventBooking
 from lib.auth.jwt_bearer import getCurrentUserId
 from lib.ticket.qrcode_handler import generateTicketQR
+from dotenv import load_dotenv
+import os
+from twilio.rest import Client
 
 
+load_dotenv('.env')
 router = APIRouter()
+
+
+TWILIO_SID = os.environ['TWILIO_SID']
+TWILIO_AUTH_TOKEN = os.environ['TWILIO_AUTH_TOKEN']
+
+twilioClient = Client(TWILIO_SID, TWILIO_AUTH_TOKEN)
 
 
 @router.post('/')
@@ -25,8 +35,19 @@ async def createPaymentEntry(paymentInfo: PaymentInfo, userId: Annotated[int, De
     db.session.add(entryModel)
     db.session.commit()
 
+    qrURL = generateTicketQR(userId, paymentInfo)
+
+    userPhoneNumber = (db.session.query(ModelUser)
+                       .with_entities(ModelUser.phonenumber)
+                       .filter(ModelUser.id == userId).first())
+
+    twilioClient.messages.create(
+        to=f"whatsapp:+2{userPhoneNumber[0]}",
+        from_="whatsapp:+14155238886",
+        body=f'Thank you for using EventHive!\n\nYour order ID is {paymentInfo.orderId}\n\nYour ticket\'s QR Code can be accessed on the following link: {qrURL}\n\nEnjoy your event!')
+
     return {
-        "qrURL": generateTicketQR(userId, paymentInfo)
+        "qrURL": qrURL
     }
 
 
