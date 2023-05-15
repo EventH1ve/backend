@@ -1,4 +1,5 @@
 import qrcode
+<<<<<<< HEAD
 from schemas.payment import PaymentInfo
 import os
 import cloudinary
@@ -6,21 +7,6 @@ from cloudinary.uploader import upload
 from dotenv import load_dotenv
 from uuid import UUID
 
-
-load_dotenv('.env')
-
-
-CLOUDINARY_CLOUD_NAME = os.environ['CLOUDINARY_CLOUD_NAME']
-CLOUDINARY_API_KEY = os.environ['CLOUDINARY_API_KEY']
-CLOUDINARY_API_SECRET = os.environ['CLOUDINARY_API_SECRET']
-
-
-cloudinary.config(
-  cloud_name = CLOUDINARY_CLOUD_NAME,
-  api_key = CLOUDINARY_API_KEY,
-  api_secret = CLOUDINARY_API_SECRET,
-  secure = True
-)
 
 """
     Generates QRCode using the specified booking id and returns the path to 
@@ -40,3 +26,4 @@ def generateTicketQR(bookingId: UUID) -> str:
     file.close()
 
     return res.get('url')
+

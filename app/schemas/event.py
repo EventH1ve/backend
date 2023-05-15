@@ -7,17 +7,29 @@ from uuid import UUID
 class Event(BaseModel):
     id: Optional[int] = None
     name: str
+    profile: str
+    datetime: datetime
     description: str
     venue: str
-    type: str
-    status: str
+    ticketTypes: List[TicketType]
+    
     creationdate: Optional[datetime]
+<<<<<<< HEAD
     registrationstartdatetime: datetime
     registrationenddatetime: datetime
     eventstartdatetime: datetime
     eventenddatetime: datetime
     profile: str
     adminid: Optional[int]
+=======
+    type: Optional[str]
+    status: Optional[str]
+    registrationstartdatetime: Optional[datetime]
+    registrationenddatetime: Optional[datetime]
+    eventstartdatetime: Optional[datetime]
+    eventenddatetime: Optional[datetime]
+
+>>>>>>> e6c69341ec0f792890cbcc565b2428b306eb9503
 
     class Config:
         orm_mode = True
@@ -90,20 +102,3 @@ class DashboardEvent(BaseModel):
 
     class Config:
         orm_mode = True
-
-
-class EventSeatLayout(BaseModel):
-    id: Optional[int] = None
-    eventid: int
-    row: str
-    seats: List[int]
-
-
-class ReceivedEvent(BaseModel):
-    name: str
-    cover: str
-    date: str
-    description: str
-    time: str
-    venue: str
-    tickets: List[dict]

@@ -12,22 +12,23 @@ class Event(Base):
     __tablename__ = 'event'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
-    description = Column(String)
-    venue = Column(String)
-    type = Column(String)
-    status = Column(String)
-    creationdate = Column(DateTime, server_default=func.now())
-    registrationstartdatetime = Column(DateTime)
-    registrationenddatetime = Column(DateTime)
-    eventstartdatetime = Column(DateTime)
-    eventenddatetime = Column(DateTime)
     profile = Column(String)
     adminid = Column(Integer, ForeignKey("admin.id"))
+    datetime = Column(DateTime)
+    venue = Column(String)
+    description = Column(String)
+    creationdate = Column(DateTime, server_default=func.now())
+
+    type = Column(String, nullable=True)
+    status = Column(String, nullable=True)
+    registrationstartdatetime = Column(DateTime, nullable=True)
+    registrationenddatetime = Column(DateTime, nullable=True)
+    eventstartdatetime = Column(DateTime, nullable=True)
+    eventenddatetime = Column(DateTime, nullable=True)
 
     admin  = relationship("Admin", back_populates="events", uselist=False)
     tickets = relationship("Ticket", back_populates="event")
     tickettypes = relationship("TicketType", secondary=eventTicketCapacity, back_populates="event")
-    seats = relationship("EventSeatLayout", back_populates="event")
 
 
 class UserEventBooking(Base):
@@ -41,15 +42,4 @@ class UserEventBooking(Base):
 
     users = relationship("User", back_populates="bookings")
 
-
-class EventSeatLayout(Base):
-    __tablename__ = 'eventseatlayout'
-    id = Column(Integer, primary_key=True, index=True)
-    eventid = Column(Integer, ForeignKey("event.id"))
-    ticketypeid = Column(Integer, ForeignKey("tickettype.id"))
-    row = Column(String)
-    seats = Column(ARRAY(Integer))
-
-    event = relationship("Event", back_populates="seats")
-    tickettype = relationship("TicketType", back_populates="seats")
     
