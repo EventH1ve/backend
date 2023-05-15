@@ -18,6 +18,7 @@ class TicketType(BaseModel):
     eventid: int
     name: str
     price: int
+    Available: Optional[bool] = True
 
     class Config:
         orm_mode = True

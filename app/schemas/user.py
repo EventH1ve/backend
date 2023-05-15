@@ -11,7 +11,7 @@ class User(BaseModel):
     phonenumber: str
     firstname: str
     lastname: str
-    type: str
+    type: Optional[str] = "user"
     createdat: Optional[datetime]
 
     class Config:

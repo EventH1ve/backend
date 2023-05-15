@@ -7,6 +7,7 @@ from models.user import User as ModelUser
 from models.event import Event as ModelEvent
 from models.ticket import TicketType as ModelTicketType
 from schemas.event import Event, ListEvent, SingleEvent, MobileEvent
+from schemas.event import TicketType
 from lib.auth.jwt_bearer import getCurrentUserId
 
 
@@ -54,8 +55,10 @@ async def findEventByAdmin(userId: Annotated[int, Depends(getCurrentUserId)], sk
             "isEnabled": isEnabled,
             "tickettypes": types
         }
+
         singleEvent = MobileEvent.parse_obj(eventDict)
         events.append(singleEvent)
+
     return events
 
 
@@ -70,14 +73,22 @@ async def findEvent(id: int):
         ModelEvent.eventstartdatetime.label("date"),
         ModelEvent.profile,
     ).filter(ModelEvent.id == id).all():
-        types = db.session.query(ModelTicketType).filter(ModelTicketType.eventid == event.id).all()
+        types = (db.session
+                 .query(ModelTicketType)
+                 .with_entities(
+                    ModelTicketType.id,
+                    ModelTicketType.name.label("type"),
+                    ModelTicketType.price,
+                    ModelTicketType.eventid
+                 )
+                 .filter(ModelTicketType.eventid == event.id).all())
         eventDict = {
             "name": event.name,
             "description":event.description,
             "venue": event.venue,
             "date": event.date,
             "cover": event.profile,
-            "tickettypes": types
+            "tickets": types
         }
         singleEvent = SingleEvent.parse_obj(eventDict)
         events.append(singleEvent)

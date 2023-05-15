@@ -73,7 +73,7 @@ class SingleEvent(BaseModel):
     venue: str
     date: datetime
     cover: str  # change "profile" to "cover"
-    tickettypes: List[TicketType]
+    tickets: List[TicketType]
     description:str
 
 

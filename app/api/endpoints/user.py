@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter
+from fastapi import APIRouter, status, HTTPException
 from fastapi_sqlalchemy import db
 from models.user import User as ModelUser
 from schemas.user import User, LoginUser
@@ -22,10 +22,7 @@ async def signup(user: User):
     query = db.session.query(ModelUser).filter(ModelUser.username == user.username).first()
     
     if query:
-        return {
-            "success": False,
-            "message": "Username already exists."
-        }
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User already exists.')
     
     user.password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -46,24 +43,27 @@ async def signup(user: User):
 
 
 @router.post('/login')
-async def login(user: LoginUser):
-    query = db.session.query(ModelUser).filter(ModelUser.username == user.username).first()
-
-    invalidResponse = {
-        "success": False,
-        "message": "Invalid credentials."
-    }
-
-    if not query:
-        return invalidResponse
+async def login(loginUser: LoginUser):
+    user = db.session.query(ModelUser).filter(ModelUser.username == loginUser.username).first()
     
-    if not bcrypt.checkpw(user.password.encode('utf-8'), query.password.encode('utf-8')):
-        return invalidResponse
+    if not user:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Invalid credentials.')
+    
+    if not bcrypt.checkpw(loginUser.password.encode('utf-8'), user.password.encode('utf-8')):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Invalid credentials.')
 
     return {
         "success": True,
         "message": "Login successful.",
-        "token": authHandler.sign(query.id)
+        "id": user.id,
+        "role": user.type.lower(),
+        "username": user.username,
+        "email": user.email,
+        "firstName": user.firstname,
+        "lastName": user.lastname,
+        "mobileNumber": user.phonenumber,
+        "gender": user.gender,
+        "token": authHandler.sign(user.id)
     }
 
 
