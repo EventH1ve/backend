@@ -32,3 +32,13 @@ class ReceievedTicketType(BaseModel):
     price: float
     available: bool
     seated: bool
+
+
+class TicketValidity(BaseModel):
+    valid: bool
+
+
+class TicketInfo(BaseModel):
+    ticketId: str
+    gate: str
+    eventId: int

@@ -39,7 +39,9 @@ class UserEventBooking(Base):
     bookingdate = Column(DateTime, server_default=func.now())
     price = Column(Float)
     transactionid = Column(String)
+    tickettype = Column(String)
 
     users = relationship("User", back_populates="bookings")
+    event = relationship("Event")
 
     
