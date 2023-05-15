@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from datetime import datetime
 from typing import List, Annotated
 from fastapi import APIRouter, Depends, status, HTTPException

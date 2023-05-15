@@ -12,24 +12,14 @@ class Event(BaseModel):
     description: str
     venue: str
     ticketTypes: List[TicketType]
-    
     creationdate: Optional[datetime]
-<<<<<<< HEAD
-    registrationstartdatetime: datetime
-    registrationenddatetime: datetime
-    eventstartdatetime: datetime
-    eventenddatetime: datetime
-    profile: str
     adminid: Optional[int]
-=======
     type: Optional[str]
     status: Optional[str]
     registrationstartdatetime: Optional[datetime]
     registrationenddatetime: Optional[datetime]
     eventstartdatetime: Optional[datetime]
     eventenddatetime: Optional[datetime]
-
->>>>>>> e6c69341ec0f792890cbcc565b2428b306eb9503
 
     class Config:
         orm_mode = True
@@ -74,8 +64,6 @@ class MobileEvent(BaseModel):
 
     class Config:
         orm_mode = True
-
-    
 
     
 class SingleEvent(BaseModel):

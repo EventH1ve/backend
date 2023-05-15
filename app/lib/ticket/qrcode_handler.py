@@ -1,5 +1,4 @@
 import qrcode
-<<<<<<< HEAD
 from schemas.payment import PaymentInfo
 import os
 import cloudinary
