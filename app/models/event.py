@@ -1,5 +1,5 @@
 from models import Base
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, Boolean
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import relationship
 from models.ticket import eventTicketCapacity
@@ -39,6 +39,7 @@ class UserEventBooking(Base):
     price = Column(Float)
     transactionid = Column(String)
     tickettype = Column(String)
+    checkedin = Column(Boolean, default=False)
 
     users = relationship("User", back_populates="bookings")
     event = relationship("Event")

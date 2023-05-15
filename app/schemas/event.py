@@ -31,6 +31,7 @@ class UserEventBooking(BaseModel):
     price: float
     transactionid: str
     tickettype: str
+    checkedin: Optional[bool] = False 
 
     class Config:
         orm_mode = True

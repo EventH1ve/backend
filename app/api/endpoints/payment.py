@@ -32,8 +32,6 @@ async def createPaymentEntry(paymentInfo: PaymentInfo, userId: Annotated[int, De
     
     ticketLinks = list()
 
-    print(len(paymentInfo.tickets))
-
     for order in paymentInfo.tickets:
         for _ in range(order['count']):
             entryModel = ModelUserEventBooking(**{'userid': userId, 'eventid': paymentInfo.eventId, 'price': paymentInfo.subtotal, 'transactionid': paymentInfo.orderId, 'tickettype': order['ticket_type']})

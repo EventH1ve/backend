@@ -23,6 +23,9 @@ async def verifyTicketValidity(userId: Annotated[int, Depends(getCurrentUserId)]
     booking = (db.session.query(ModelUserEventBooking)
                .filter(ModelUserEventBooking.id == ticketInfo.ticketId).first())
     
+    booking.checkedin = True
+    db.session.commit()
+
     userBooking = UserEventBooking.from_orm(booking)
 
     return TicketValidity(valid=((ticketInfo.gate.lower() == userBooking.tickettype.lower()) and (ticketInfo.eventId == userBooking.eventid)))
