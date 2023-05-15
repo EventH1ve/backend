@@ -10,7 +10,7 @@ class Event(Base):
     __tablename__ = 'event'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
-    coverImage = Column(String)
+    profile = Column(String)
     datetime = Column(DateTime)
     venue = Column(String)
     description = Column(String)

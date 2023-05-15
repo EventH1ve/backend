@@ -6,7 +6,7 @@ from schemas.ticket import TicketType
 class Event(BaseModel):
     id: Optional[int] = None
     name: str
-    coverImage: str
+    profile: str
     datetime: datetime
     description: str
     venue: str
