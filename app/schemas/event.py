@@ -91,3 +91,13 @@ class DashboardEvent(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ReceivedEvent(BaseModel):
+    name: str
+    cover: str
+    date: str
+    description: str
+    time: str
+    venue: str
+    tickets: List[dict]

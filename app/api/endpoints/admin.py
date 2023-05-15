@@ -13,7 +13,7 @@ router = APIRouter()
 async def createEvent(event: Event, userId: Annotated[int, Depends(getCurrentUserId)]):
 
     event_data = event.dict(exclude={"ticketTypes"})
-    event_data['admin_id'] = userId
+    event_data['adminid'] = userId
     createdEvent = ModelEvent(**event_data)
     db.session.add(createdEvent)
     db.session.commit()
@@ -41,19 +41,20 @@ async def getAdminEvents(userId: Annotated[int, Depends(getCurrentUserId)], skip
         ModelEvent.venue,
         ModelEvent.datetime.label("date"),
         ModelEvent.profile,
-    ).filter(ModelEvent.admin_id == userId).group_by(ModelEvent.id).offset(skip).limit(limit).all()
+    ).filter(ModelEvent.adminid == userId).group_by(ModelEvent.id).offset(skip).limit(limit).all()
         
     return events
 
 @router.get('/event/{id}', response_model=SingleEvent)
-async def getAdminEvent(userId: Annotated[int, Depends(getCurrentUserId)]):
+async def getAdminEvent(id: int, userId: Annotated[int, Depends(getCurrentUserId)]):
     event = db.session.query(ModelEvent).with_entities(
         ModelEvent.id,
         ModelEvent.name,
         ModelEvent.venue,
+        ModelEvent.description,
         ModelEvent.datetime.label("date"),
         ModelEvent.profile,
-    ).filter(ModelEvent.admin_id == userId, ModelEvent.id == id).first()[0]     #[0]
+    ).filter(ModelEvent.adminid == userId, ModelEvent.id == id).first()     #[0]
 
     ticketTypes = db.session.query(ModelTicketType).filter(ModelTicketType.eventid == event.id).all()
     eventBookingCount = len( db.session.query(UserEventBooking).filter(UserEventBooking.eventid == event.id).all() )
@@ -62,9 +63,10 @@ async def getAdminEvent(userId: Annotated[int, Depends(getCurrentUserId)]):
         "name": event.name,
         "venue": event.venue,
         "date": event.date,
-        "profile": event.profile,
+        "description": event.description,
+        "cover": event.profile,
         "attendess": eventBookingCount,
-        "ticketTypes": ticketTypes
+        "tickettypes": ticketTypes
     }
         
     return eventDict
