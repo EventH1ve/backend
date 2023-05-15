@@ -4,7 +4,7 @@ For the design of the database, requirements about the application were first ga
 ![Database ER diagram](img/db_er_diagram.png)
 
 -The ER diagram can be more closely examined:
-![Database ER diagram](pgadmin/db_er_diagram.pgerd)
+[Database ERD](pgadmin/db_er_diagram.pgerd)
 
 -The business rules used to create the ER diagram can also be found [here](https://handsomely-tabletop-129.notion.site/DB-Business-Rules-4c6d91638f2948d2a5aa8d2503afe0a2).
 
