@@ -16,41 +16,34 @@ router = APIRouter()
 @router.post('/event')
 async def createEvent(event: ModelAdminEvent, userId: Annotated[int, Depends(getCurrentUserId)]):
 
-    try:
-        event_data = event.dict(exclude={"ticketTypes"})
-
-        event_datetime_str = "T".join([event.date, event.time])
-        event_datetime = datetime.strptime(event_datetime_str, "%Y-%m-%dT%H:%M:%S")
-        event_data["datetime"] = event_datetime
-        
-        event_data.pop("date", None)
-        event_data.pop("time", None)
-
-        admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
-        if(not admin):
-            adminModel = ModelAdmin(userid=userId)
-            db.session.add(adminModel)
-            db.session.commit()
-        
-        createdEvent = ModelEvent(**event_data)
-        db.session.add(createdEvent)
+    event_data = event.dict(exclude={"ticketTypes"})
+    event_datetime_str = "T".join([event.date, event.time])
+    event_datetime = datetime.strptime(event_datetime_str, "%Y-%m-%dT%H:%M:%S")
+    event_data["datetime"] = event_datetime
+    
+    event_data.pop("date", None)
+    event_data.pop("time", None)
+    admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
+    if(not admin):
+        adminModel = ModelAdmin(userid=userId)
+        db.session.add(adminModel)
         db.session.commit()
-
-
-        for ticket_type in event.ticketTypes:
-            ticket_type_data = ticket_type.dict()
-            ticket_type_data["eventid"] = createdEvent.id  
-            createdTicketType = ModelTicketType(**ticket_type_data)
-            db.session.add(createdTicketType)
-
-        db.session.commit()
-
-        return {
-            "success": True,
-            "message": "Event created."
-        }
-    except:
-        return event.date, event.time, event_data, event_datetime_str, event_datetime
+    
+    event_data['adminid'] = userId
+    
+    createdEvent = ModelEvent(**event_data)
+    db.session.add(createdEvent)
+    db.session.commit()
+    for ticket_type in event.ticketTypes:
+        ticket_type_data = ticket_type.dict()
+        ticket_type_data["eventid"] = createdEvent.id  
+        createdTicketType = ModelTicketType(**ticket_type_data)
+        db.session.add(createdTicketType)
+    db.session.commit()
+    return {
+        "success": True,
+        "message": "Event created."
+    }
 
 
 @router.get('/event', response_model=List[ListEvent])
@@ -194,18 +187,9 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
 
     return eventStatistics
 
+
 @router.put('/event/{event_id}')
 async def updateEvent(event_id: int, event: ModelAdminEvent, userId: Annotated[int, Depends(getCurrentUserId)]):
-
-    event_data = event.dict(exclude={"ticketTypes"})
-
-    admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
-    if not admin:
-        adminModel = ModelAdmin(userid=userId)
-        db.session.add(adminModel)
-        db.session.commit()
-
-    event_data['adminid'] = userId
 
     existing_event = db.session.query(ModelEvent).filter(ModelEvent.id == event_id).first()
     if not existing_event:
@@ -213,13 +197,29 @@ async def updateEvent(event_id: int, event: ModelAdminEvent, userId: Annotated[i
             "success": False,
             "message": "Event not found."
         }
+    
+    event_data = event.dict(exclude={"ticketTypes"})
+
+    admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
+    if not admin:
+        return {
+            "success": False,
+            "message": "Admin who created the event not found."
+        }
+
+    event_datetime_str = "T".join([event.date, event.time])
+    event_datetime = datetime.strptime(event_datetime_str, "%Y-%m-%dT%H:%M:%S")
+    event_data["datetime"] = event_datetime
+    
+    event_data.pop("date", None)
+    event_data.pop("time", None)
 
     #Existing_event.update(event_data)
-    existing_event.name        = event.name        
-    existing_event.profile     = event.profile     
-    existing_event.description = event.description 
-    existing_event.venue       = event.venue         
-    existing_event.datetime    = event.datetime    
+    existing_event.name        = event_data['name']        
+    existing_event.profile     = event_data['profile'] 
+    existing_event.description = event_data['description'] 
+    existing_event.venue       = event_data['venue']   
+    existing_event.datetime    = event_data['datetime'] 
 
     db.session.commit()
 
