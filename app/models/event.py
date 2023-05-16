@@ -22,7 +22,7 @@ class Event(Base):
     eventstartdatetime = Column(DateTime)
     eventenddatetime = Column(DateTime)
     profile = Column(String)
-    adminid = Column(Integer, ForeignKey("admin.id"))
+    adminid = Column(Integer, ForeignKey("admin.userid"))
 
     admin  = relationship("Admin", back_populates="events", uselist=False)
     tickets = relationship("Ticket", back_populates="event")

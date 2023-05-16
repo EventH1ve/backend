@@ -93,6 +93,16 @@ class DashboardEvent(BaseModel):
     class Config:
         orm_mode = True
 
+class DashboardEventAdmin(BaseModel):
+    id: Optional[int] = None
+    name: str
+    venue: str
+    date: datetime
+        
+    class Config:
+        orm_mode = True
+
+
 
 class EventSeatLayout(BaseModel):
     id: Optional[int] = None
