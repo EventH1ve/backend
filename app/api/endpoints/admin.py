@@ -175,3 +175,49 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
 
     return eventStatistics
 
+@router.put('/event/{event_id}')
+async def updateEvent(event_id: int, event: ModelAdminEvent, userId: Annotated[int, Depends(getCurrentUserId)]):
+
+    event_data = event.dict(exclude={"ticketTypes"})
+
+    admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
+    if not admin:
+        adminModel = ModelAdmin(userid=userId)
+        db.session.add(adminModel)
+        db.session.commit()
+
+    event_data['adminid'] = userId
+
+    existing_event = db.session.query(ModelEvent).filter(ModelEvent.id == event_id).first()
+    if not existing_event:
+        return {
+            "success": False,
+            "message": "Event not found."
+        }
+
+    existing_event.update(event_data)
+    db.session.commit()
+
+    # Update exsiting ticket types or create new ticket types
+    for ticket_type in event.ticketTypes:
+
+        ticket_type_data = ticket_type.dict()
+        ticket_type_data["eventid"] = event_id
+
+        existing_ticket_type = (
+            db.session.query(ModelTicketType)
+            .filter(ModelTicketType.eventid == event_id, ModelTicketType.name == ticket_type.name)
+            .first()
+        )
+        if existing_ticket_type:
+            existing_ticket_type.update(ticket_type_data)
+        else:
+            createdTicketType = ModelTicketType(**ticket_type_data)
+            db.session.add(createdTicketType)
+
+    db.session.commit()
+
+    return {
+        "success": True,
+        "message": "Event updated."
+    }
