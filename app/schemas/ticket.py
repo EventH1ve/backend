@@ -26,6 +26,17 @@ class TicketType(BaseModel):
     class Config:
         orm_mode = True
 
+class AdminTicketType(BaseModel):
+    id: Optional[int] = None
+    name: str
+    price: int
+    limit: int
+    seated: bool
+    seats: Dict[str, List[int]]
+
+    class Config:
+        orm_mode = True
+
 
 class ReceievedTicketType(BaseModel):
     name: str
