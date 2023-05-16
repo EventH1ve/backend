@@ -79,3 +79,99 @@ async def getAdminEvent(id: int, userId: Annotated[int, Depends(getCurrentUserId
         
     return eventDict
 
+@router.get('event/statistics/{id}')
+async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUserId)]):
+
+    #Get event to fetch event details
+    event = db.session.query(ModelEvent).filter(ModelEvent.adminid == userId, ModelEvent.id == id).first()
+    #Fetch the user that serves as event admin for his details
+    eventAdmin = db.session.query(ModelUser).filter(ModelUser.id == userId).first()
+    #Fetch all purchased tickets of this event
+    eventTickets = db.session.query(UserEventBooking).filter(UserEventBooking.eventid == id).all() 
+    #Fetch all ticket types of this event
+    eventTicketTypes = db.session.query(ModelTicketType).filter(ModelTicketType.eventid == id).all()
+
+    #Number of checked tickets
+    checked = 0
+    #Total revenue of the event tickets
+    revenue = 0
+    
+    #Event gender percentage
+    genderPercentage = dict(list())
+    '''genderPercentage = {
+        "ticketType1": [number of tickets of male attendees, number of tickets of female attendees]
+        "ticketType2": [10, 20],
+        "ticketType3": [20,15],
+        ...
+    }'''
+
+    
+    #Event tickets analytics
+    ticketsData = dict(list())
+    '''TicketsData = {
+        "Total" = [total checked in tickets => checked, total event capacity from all ticketTypes => event.capacity]
+        "ticketType1": [number of checked tickets of this type, total number of tickets available of this type => ticketType.limit]
+        "ticketType2": [10, 20],
+        "ticketType3": [20, 40],
+        ...
+    }'''
+
+    #Store all event attendees
+    eventAttendees = []
+
+    #For each bought ticket
+    for ticket in eventTickets:
+        #Add the ticket price to the total revenue
+        revenue+= ticket.price
+
+        if(ticket.checked):
+            #If the ticket is checked, add it to the checked tickets count and  
+            checked+=1
+            #Add the ticket as a checked ticket for this specific ticket type
+            ticketsData[ticket.type][0]+=1
+
+        #Get the attendee who bought this ticket
+        attendee = db.session.query(ModelUser).filter(ModelUser.id == ticket.userid).first()
+        
+        #Append this user as event attendee
+        eventAttendees.append(attendee)
+
+        #Increment gender percentage for either male or female count for this specific ticket type
+        if(attendee.gender.lower() == 'male'):
+            genderPercentage[ticket.type][0]+=1
+        else:
+            genderPercentage[ticket.type][1]+=1
+
+        #Total attendees of this ticket type
+        genderPercentage[ticket.type].totalCount+=1
+
+    #For each ticket Type, Set the total available tickets of this type => ticketType.limit and add it to ticketsData
+    for ticketType in eventTicketTypes:
+        ticketsData[ticketType][1] = ticketType.limit
+
+    #Set total ticketsData => [total checked tickets, total event capacity]
+    ticketsData['Total'] = [checked, event.capacity]
+
+    eventStatistics = {
+        "name": event.name,
+        "cover": event.profile,
+        "date": event.datetime,
+        "description": event.description,
+        "time": event.time,
+        "venue": event.venue,
+        "organizer": eventAdmin.username,
+        "counters": {
+            "capacity": event.capacity,
+            "soldTickets": len(eventTickets),
+            "revenue": revenue,
+            "checked": checked,
+            "gateStaff": 5,
+        },
+        "genderPercentage":  genderPercentage,
+        "ticketsData": ticketsData,
+        "ticketTypes": eventTicketTypes,
+        "attendess": eventAttendees
+    }
+
+    return eventStatistics
+
