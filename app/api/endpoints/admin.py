@@ -133,6 +133,7 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
 
     #For each bought ticket
     for ticket in eventTickets:
+        ticketType = db.session.query(ModelTicketType).filter(ModelTicketType.eventid == id, ModelTicketType.name == ticket.tickettype).first()
         #Add the ticket price to the total revenue
         revenue+= ticket.price
 
@@ -140,7 +141,7 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
             #If the ticket is checked, add it to the checked tickets count and  
             checked+=1
             #Add the ticket as a checked ticket for this specific ticket type
-            ticketsData[ticket.type][0]+=1
+            ticketsData[ticket.tickettype][0]+=1
 
         #Get the attendee who bought this ticket
         attendee = db.session.query(ModelUser).filter(ModelUser.id == ticket.userid).first()
@@ -156,10 +157,11 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
 
         #Total attendees of this ticket type
         genderPercentage[ticket.type].totalCount+=1
+        
+        #For each ticket Type, Set the total available tickets of this type => ticketType.limit and add it to ticketsData
+        ticketsData[ticket.tickettype][1] = ticketType.limit
 
-    #For each ticket Type, Set the total available tickets of this type => ticketType.limit and add it to ticketsData
-    for ticketType in eventTicketTypes:
-        ticketsData[ticketType.name][1] = ticketType.limit
+
 
     #Set total ticketsData => [total checked tickets, total event capacity]
     ticketsData['Total'] = [checked, event.capacity]
@@ -167,9 +169,8 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
     eventStatistics = {
         "name": event.name,
         "cover": event.profile,
-        "date": event.datetime,
+        "datetime": event.datetime,
         "description": event.description,
-        "time": event.time,
         "venue": event.venue,
         "organizer": eventAdmin.username,
         "counters": {
