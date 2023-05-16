@@ -8,38 +8,50 @@ from models.ticket import TicketType as ModelTicketType, Ticket as ModelTicket
 from models.admin import Admin as ModelAdmin
 from models.user import User as ModelUser
 from schemas.event import Event, ListEvent, SingleEvent, AdminEvent as ModelAdminEvent
+from datetime import datetime, time
+
 
 router = APIRouter()
 
 @router.post('/event')
 async def createEvent(event: ModelAdminEvent, userId: Annotated[int, Depends(getCurrentUserId)]):
 
-    event_data = event.dict(exclude={"ticketTypes"})
+    try:
+        event_data = event.dict(exclude={"ticketTypes"})
 
-    admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
-    if(not admin):
-        adminModel = ModelAdmin(userid=userId)
-        db.session.add(adminModel)
+        event_datetime_str = "T".join([event.date, event.time])
+        event_datetime = datetime.strptime(event_datetime_str, "%Y-%m-%dT%H:%M:%S")
+        event_data["datetime"] = event_datetime
+        
+        event_data.pop("date", None)
+        event_data.pop("time", None)
+
+        admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
+        if(not admin):
+            adminModel = ModelAdmin(userid=userId)
+            db.session.add(adminModel)
+            db.session.commit()
+        
+        createdEvent = ModelEvent(**event_data)
+        db.session.add(createdEvent)
         db.session.commit()
-    
-    event_data['adminid'] = userId
-    createdEvent = ModelEvent(**event_data)
-    db.session.add(createdEvent)
-    db.session.commit()
 
 
-    for ticket_type in event.ticketTypes:
-        ticket_type_data = ticket_type.dict()
-        ticket_type_data["eventid"] = createdEvent.id  
-        createdTicketType = ModelTicketType(**ticket_type_data)
-        db.session.add(createdTicketType)
+        for ticket_type in event.ticketTypes:
+            ticket_type_data = ticket_type.dict()
+            ticket_type_data["eventid"] = createdEvent.id  
+            createdTicketType = ModelTicketType(**ticket_type_data)
+            db.session.add(createdTicketType)
 
-    db.session.commit()
+        db.session.commit()
 
-    return {
-        "success": True,
-        "message": "Event created."
-    }
+        return {
+            "success": True,
+            "message": "Event created."
+        }
+    except:
+        return event.date, event.time, event_data, event_datetime_str, event_datetime
+
 
 @router.get('/event', response_model=List[ListEvent])
 async def getAdminEvents(userId: Annotated[int, Depends(getCurrentUserId)], skip: int = 0, limit: int = 10):
@@ -79,17 +91,24 @@ async def getAdminEvent(id: int, userId: Annotated[int, Depends(getCurrentUserId
         
     return eventDict
 
-@router.get('event/statistics/{id}')
+@router.get('/event/statistics/{id}')
 async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUserId)]):
 
     #Get event to fetch event details
     event = db.session.query(ModelEvent).filter(ModelEvent.adminid == userId, ModelEvent.id == id).first()
+    # event = event.dict()
+    
     #Fetch the user that serves as event admin for his details
     eventAdmin = db.session.query(ModelUser).filter(ModelUser.id == userId).first()
+    # eventAdmin = eventAdmin.dict()
+    
     #Fetch all purchased tickets of this event
     eventTickets = db.session.query(UserEventBooking).filter(UserEventBooking.eventid == id).all() 
+    # eventTickets = eventTickets.dict()
+    
     #Fetch all ticket types of this event
     eventTicketTypes = db.session.query(ModelTicketType).filter(ModelTicketType.eventid == id).all()
+    # eventTicketTypes = eventTicketTypes.dict()
 
     #Number of checked tickets
     checked = 0
@@ -147,7 +166,7 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
 
     #For each ticket Type, Set the total available tickets of this type => ticketType.limit and add it to ticketsData
     for ticketType in eventTicketTypes:
-        ticketsData[ticketType][1] = ticketType.limit
+        ticketsData[ticketType.name][1] = ticketType.limit
 
     #Set total ticketsData => [total checked tickets, total event capacity]
     ticketsData['Total'] = [checked, event.capacity]
@@ -195,23 +214,34 @@ async def updateEvent(event_id: int, event: ModelAdminEvent, userId: Annotated[i
             "message": "Event not found."
         }
 
-    existing_event.update(event_data)
+    #Existing_event.update(event_data)
+    existing_event.name        = event.name        
+    existing_event.profile     = event.profile     
+    existing_event.description = event.description 
+    existing_event.venue       = event.venue         
+    existing_event.datetime    = event.datetime    
+
     db.session.commit()
 
     # Update exsiting ticket types or create new ticket types
     for ticket_type in event.ticketTypes:
 
         ticket_type_data = ticket_type.dict()
-        ticket_type_data["eventid"] = event_id
 
         existing_ticket_type = (
             db.session.query(ModelTicketType)
             .filter(ModelTicketType.eventid == event_id, ModelTicketType.name == ticket_type.name)
             .first()
         )
+        #Existing_ticket_type.update(ticket_type_data)
         if existing_ticket_type:
-            existing_ticket_type.update(ticket_type_data)
+            existing_ticket_type.name = ticket_type.name
+            existing_ticket_type.price = ticket_type.price
+            existing_ticket_type.limit = ticket_type.limit
+            existing_ticket_type.seated = ticket_type.seated
+            existing_ticket_type.seats = ticket_type.seats
         else:
+            ticket_type_data["eventid"] = event_id
             createdTicketType = ModelTicketType(**ticket_type_data)
             db.session.add(createdTicketType)
 
