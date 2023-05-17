@@ -62,9 +62,8 @@ async def findEventByAdmin(userId: Annotated[int, Depends(getCurrentUserId)], sk
     return events
 
 
-@router.get('/{id}', response_model=List[SingleEvent])
+@router.get('/{id}', response_model=SingleEvent)
 async def findEvent(id: int):
-    events = []
     for event in db.session.query(ModelEvent).with_entities(
         ModelEvent.id,
         ModelEvent.name,
@@ -77,7 +76,7 @@ async def findEvent(id: int):
                  .query(ModelTicketType)
                  .with_entities(
                     ModelTicketType.id,
-                    ModelTicketType.name.label("type"),
+                    ModelTicketType.name,
                     ModelTicketType.price,
                     ModelTicketType.eventid
                  )
@@ -91,8 +90,7 @@ async def findEvent(id: int):
             "tickets": types
         }
         singleEvent = SingleEvent.parse_obj(eventDict)
-        events.append(singleEvent)
-    return events
+    return singleEvent
 
 
 @router.post('/')
