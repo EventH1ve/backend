@@ -44,7 +44,6 @@ class ListEvent(BaseModel):
     date: datetime
     price: Optional[int] = 0
     profile: str
-    
 
     class Config:
         orm_mode = True
@@ -56,16 +55,12 @@ class MobileEvent(BaseModel):
     venue: str
     date: datetime
     price: Optional[int] = 0
-    profile: str
+    img: str
     isEnabled:str
     tickettypes: List[TicketType]
 
-    
-
     class Config:
         orm_mode = True
-
-    
 
     
 class SingleEvent(BaseModel):
