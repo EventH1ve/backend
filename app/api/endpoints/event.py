@@ -51,7 +51,7 @@ async def findEventByAdmin(userId: Annotated[int, Depends(getCurrentUserId)], sk
             "venue": event.venue,
             "date": event.date,
             "price": event.price,
-            "profile": event.profile,
+            "img": event.profile,
             "isEnabled": isEnabled,
             "tickettypes": types
         }
