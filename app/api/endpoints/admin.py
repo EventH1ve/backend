@@ -118,10 +118,17 @@ async def getEventStatistics(id: int, userId: Annotated[int, Depends(getCurrentU
             ticketsData[ticket.tickettype][0] += 1
 
         #Get the attendee who bought this ticket
-        attendee = db.session.query(ModelUser).filter(ModelUser.id == ticket.userid).first()
+        attendee = (db.session.query(ModelUser)
+                    .filter(ModelUser.id == ticket.userid).first())
         
         #Append this user as event attendee
-        eventAttendees.append(attendee)
+        eventAttendees.append({
+            "username": attendee.username,
+            "name": f'{attendee.firstname} {attendee.lastname}',
+            "ticketType": ticket.tickettype,
+            "status": "attended" if ticket.checkedin else "paid",
+            "createdat": ticket.bookingdate
+        })
 
         #Increment gender percentage for either male or female count for this specific ticket type
         if(attendee.gender.lower() == 'male'):
@@ -155,7 +162,7 @@ async def getEventStatistics(id: int, userId: Annotated[int, Depends(getCurrentU
         "genderPercentage":  genderPercentage,
         "ticketsData": ticketsData,
         "ticketTypes": eventTicketTypes,
-        "attendess": eventAttendees
+        "attendees": eventAttendees
     }
 
     return eventStatistics

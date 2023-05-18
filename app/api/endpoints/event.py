@@ -29,7 +29,7 @@ async def listEvents(skip: int = 0, limit: int = 10):
 
 
 @router.get('/app', response_model=List[MobileEvent])
-async def findEventByAdmin(userId: Annotated[int, Depends(getCurrentUserId)], skip: int = 0, limit: int = 10):
+async def findEventsByAdmin(userId: Annotated[int, Depends(getCurrentUserId)], skip: int = 0, limit: int = 10):
     events = []
     now = datetime.now().date()
     for event in db.session.query(ModelEvent).with_entities(
