@@ -22,9 +22,9 @@ class DashboardMetrics(BaseModel):
         orm_mode = True
 
 class DashboardMetricsAdmin(BaseModel):
-    Counters: CountersForAdmin
-    UpcomingEvents: List[DashboardEventAdmin]
-    PastEvents: List[DashboardEventAdmin]
+    counters: CountersForAdmin
+    upcomingEvents: List[DashboardEventAdmin]
+    pastEvents: List[DashboardEventAdmin]
 
     class Config:
         orm_mode = True

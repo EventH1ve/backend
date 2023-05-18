@@ -100,13 +100,13 @@ async def getAdminDashboardMetrics(userId: Annotated[int, Depends(getCurrentUser
     membershipDuration = membershipEndDate - createdAt
 
     return {
-        "Counters": {
+        "counters": {
             "upcomingEvents": len(upcomingEvents),
             "pastEvents": len(previousEvents),
             "leftDaysforTheMembership": f'{ceil(membershipDuration.total_seconds() / (60 * 60 * 24))} Days'
         },
-        "UpcomingEvents": parse_obj_as(List[DashboardEventAdmin], upcomingEvents),
-        "PastEvents": parse_obj_as(List[DashboardEventAdmin], previousEvents)
+        "upcomingEvents": parse_obj_as(List[DashboardEventAdmin], upcomingEvents),
+        "pastEvents": parse_obj_as(List[DashboardEventAdmin], previousEvents)
     } 
 
 
