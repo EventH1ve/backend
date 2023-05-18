@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, List, Optional
 from pydantic import BaseModel
 
 
@@ -19,6 +19,22 @@ class TicketType(BaseModel):
     name: str
     price: int
     Available: Optional[bool] = True
+    limit: int
+    seated: bool
+    seats: Dict[str, List[int]]
+
+
+    class Config:
+        orm_mode = True
+
+
+class AdminTicketType(BaseModel):
+    id: Optional[int] = None
+    name: str
+    price: int
+    limit: int
+    seated: bool
+    seats: Dict[str, List[int]]
 
     class Config:
         orm_mode = True

@@ -4,10 +4,12 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi_sqlalchemy import db
 from sqlalchemy import func
 from models.user import User as ModelUser
+from lib.auth.jwt_bearer import getCurrentUserId
 from models.event import Event as ModelEvent
 from models.ticket import TicketType as ModelTicketType
-from schemas.event import Event, ListEvent, SingleEvent, MobileEvent
+from schemas.event import Event, ListEvent, SingleEvent, MobileEvent, AdminEvent
 from lib.auth.jwt_bearer import getCurrentUserId
+from models.admin import Admin as ModelAdmin
 
 
 router = APIRouter()
@@ -93,24 +95,35 @@ async def findEventById(id: int):
 
 
 @router.post('/')
-async def createEvent(event: Event, userId: Annotated[int, Depends(getCurrentUserId)]):
-    userType = (db.session.query(ModelUser)
-            .with_entities(ModelUser.type)
-            .filter(ModelUser.id == userId).first())
+async def createEvent(event: AdminEvent, userId: Annotated[int, Depends(getCurrentUserId)]):
+    event_data = event.dict(exclude={"ticketTypes"})
+    event_datetime_str = "T".join([event.date, event.time])
+    event_datetime = datetime.strptime(event_datetime_str, "%Y-%m-%dT%H:%M:%S")
+    event_data["eventstartdatetime"] = event_datetime
     
-    if userType[0].lower() != 'admin':
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User is not an Admin.')
+    event_data.pop("date", None)
+    event_data.pop("time", None)
+    admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
+    if(not admin):
+        adminModel = ModelAdmin(userid=userId)
+        db.session.add(adminModel)
+        db.session.commit()
+    
+    event_data['adminid'] = userId
+    
+    createdEvent = ModelEvent(**event_data)
+    db.session.add(createdEvent)
+    db.session.commit()
+    
+    for ticket_type in event.ticketTypes:
+        ticket_type_data = ticket_type.dict()
+        ticket_type_data["eventid"] = createdEvent.id  
+        createdTicketType = ModelTicketType(**ticket_type_data)
+        db.session.add(createdTicketType)
 
-    event.adminid = userId
-
-    eventModel = ModelEvent(**event.dict())
-
-    db.session.add(eventModel)
     db.session.commit()
 
     return {
         "success": True,
         "message": "Event created."
     }
-
-

@@ -1,26 +1,40 @@
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, date, time
 from pydantic import BaseModel
-from schemas.ticket import TicketType
+from schemas.ticket import TicketType, AdminTicketType
 from uuid import UUID
 
 class Event(BaseModel):
     id: Optional[int] = None
     name: str
+    profile: str
+    capacity: int
+    datetime: datetime
     description: str
     venue: str
-    type: str
-    status: str
+    ticketTypes: List[TicketType]
     creationdate: Optional[datetime]
-    registrationstartdatetime: datetime
-    registrationenddatetime: datetime
-    eventstartdatetime: datetime
-    eventenddatetime: datetime
-    profile: str
     adminid: Optional[int]
+    type: Optional[str]
+    status: Optional[str]
+    registrationstartdatetime: Optional[datetime]
+    registrationenddatetime: Optional[datetime]
+    eventstartdatetime: Optional[datetime]
+    eventenddatetime: Optional[datetime]
 
     class Config:
         orm_mode = True
+
+
+class AdminEvent(BaseModel):
+    name: str
+    profile: str
+    capacity: int
+    date: str
+    time: str
+    description: str
+    venue: str
+    ticketTypes: List[AdminTicketType]
 
 
 class UserEventBooking(BaseModel):
@@ -97,13 +111,6 @@ class DashboardEventAdmin(BaseModel):
     class Config:
         orm_mode = True
 
-
-
-class EventSeatLayout(BaseModel):
-    id: Optional[int] = None
-    eventid: int
-    row: str
-    seats: List[int]
 
 
 class ReceivedEvent(BaseModel):
