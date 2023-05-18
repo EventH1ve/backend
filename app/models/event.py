@@ -3,7 +3,6 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, Boo
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import relationship
 from models.ticket import eventTicketCapacity
-from models.admin import Admin
 from sqlalchemy.sql import func
 import uuid
 

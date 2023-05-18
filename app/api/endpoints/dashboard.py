@@ -63,7 +63,7 @@ async def getDashboardMetrics(userId: Annotated[int, Depends(getCurrentUserId)])
 
 
 @router.get('/admin', response_model=DashboardMetricsAdmin)
-async def getDashboardMetrics(userId: Annotated[int, Depends(getCurrentUserId)]):
+async def getAdminDashboardMetrics(userId: Annotated[int, Depends(getCurrentUserId)]):
     membershipDuration = (db.session.query(ModelAdmin)
                           .with_entities(ModelAdmin.membershipend)
                           .filter(ModelAdmin.userid == userId).first())

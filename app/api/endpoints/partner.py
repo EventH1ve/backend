@@ -6,8 +6,10 @@ from schemas.partner import Partner
 
 
 router = APIRouter()
+
+
 @router.get('/',response_model=List[Partner])
-async def listEvents(skip: int = 0, limit: int = 10):
+async def listPartners():
     partners = db.session.query(ModelPartner).with_entities(
         ModelPartner.id,
         ModelPartner.name,

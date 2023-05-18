@@ -8,6 +8,7 @@ from models.user import User as ModelUser
 from models.event import UserEventBooking as ModelUserEventBooking
 from lib.auth.jwt_bearer import getCurrentUserId
 
+
 router = APIRouter()
 
 

@@ -1,5 +1,4 @@
 import qrcode
-from schemas.payment import PaymentInfo
 import os
 import cloudinary
 from cloudinary.uploader import upload

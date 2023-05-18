@@ -1,7 +1,6 @@
 from models import Base
-from sqlalchemy import Column, Integer, ForeignKey, String, DateTime
+from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
 import datetime
 
 class Admin(Base):

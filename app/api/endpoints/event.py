@@ -7,7 +7,6 @@ from models.user import User as ModelUser
 from models.event import Event as ModelEvent
 from models.ticket import TicketType as ModelTicketType
 from schemas.event import Event, ListEvent, SingleEvent, MobileEvent
-from schemas.event import TicketType
 from lib.auth.jwt_bearer import getCurrentUserId
 
 
@@ -63,7 +62,7 @@ async def findEventByAdmin(userId: Annotated[int, Depends(getCurrentUserId)], sk
 
 
 @router.get('/{id}', response_model=SingleEvent)
-async def findEvent(id: int):
+async def findEventById(id: int):
     for event in db.session.query(ModelEvent).with_entities(
         ModelEvent.id,
         ModelEvent.name,
