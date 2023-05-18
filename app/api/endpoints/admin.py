@@ -1,62 +1,17 @@
-from typing import List, Annotated
-from fastapi import APIRouter, Depends
+from typing import Annotated
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_sqlalchemy import db
-from sqlalchemy import func
 from lib.auth.jwt_bearer import getCurrentUserId
 from models.event import Event as ModelEvent, UserEventBooking
-from models.ticket import TicketType as ModelTicketType, Ticket as ModelTicket
+from models.ticket import TicketType as ModelTicketType
 from models.admin import Admin as ModelAdmin
 from models.user import User as ModelUser
-from schemas.event import Event, ListEvent, SingleEvent, AdminEvent as ModelAdminEvent
-from datetime import datetime, time
+from schemas.event import SingleEvent, AdminEvent as ModelAdminEvent
+from datetime import datetime
 
 
 router = APIRouter()
 
-@router.post('/event')
-async def createEvent(event: ModelAdminEvent, userId: Annotated[int, Depends(getCurrentUserId)]):
-
-    event_data = event.dict(exclude={"ticketTypes"})
-    event_datetime_str = "T".join([event.date, event.time])
-    event_datetime = datetime.strptime(event_datetime_str, "%Y-%m-%dT%H:%M:%S")
-    event_data["datetime"] = event_datetime
-    
-    event_data.pop("date", None)
-    event_data.pop("time", None)
-    admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
-    if(not admin):
-        adminModel = ModelAdmin(userid=userId)
-        db.session.add(adminModel)
-        db.session.commit()
-    
-    event_data['adminid'] = userId
-    
-    createdEvent = ModelEvent(**event_data)
-    db.session.add(createdEvent)
-    db.session.commit()
-    for ticket_type in event.ticketTypes:
-        ticket_type_data = ticket_type.dict()
-        ticket_type_data["eventid"] = createdEvent.id  
-        createdTicketType = ModelTicketType(**ticket_type_data)
-        db.session.add(createdTicketType)
-    db.session.commit()
-    return {
-        "success": True,
-        "message": "Event created."
-    }
-
-
-@router.get('/event', response_model=List[ListEvent])
-async def getAdminEvents(userId: Annotated[int, Depends(getCurrentUserId)], skip: int = 0, limit: int = 10):
-    events = db.session.query(ModelEvent).with_entities(
-        ModelEvent.id,
-        ModelEvent.name,
-        ModelEvent.venue,
-        ModelEvent.datetime.label("date"),
-        ModelEvent.profile,
-    ).filter(ModelEvent.adminid == userId).group_by(ModelEvent.id).offset(skip).limit(limit).all()
-        
-    return events
 
 @router.get('/event/{id}', response_model=SingleEvent)
 async def getAdminEvent(id: int, userId: Annotated[int, Depends(getCurrentUserId)]):
@@ -65,7 +20,7 @@ async def getAdminEvent(id: int, userId: Annotated[int, Depends(getCurrentUserId
         ModelEvent.name,
         ModelEvent.venue,
         ModelEvent.description,
-        ModelEvent.datetime.label("date"),
+        ModelEvent.eventstartdatetime.label("date"),
         ModelEvent.profile,
     ).filter(ModelEvent.adminid == userId, ModelEvent.id == id).first()     
 
@@ -84,13 +39,23 @@ async def getAdminEvent(id: int, userId: Annotated[int, Depends(getCurrentUserId
         
     return eventDict
 
+
 @router.get('/event/statistics/{id}')
-async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUserId)]):
+async def getEventStatistics(id: int, userId: Annotated[int, Depends(getCurrentUserId)]):
+
+    # Get admin id
+    adminId = db.session.query(ModelAdmin).with_entities(ModelAdmin.id).filter(ModelAdmin.userid == userId).first()[0]
+
+    if not adminId:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User is not an Admin.')
 
     #Get event to fetch event details
-    event = db.session.query(ModelEvent).filter(ModelEvent.adminid == userId, ModelEvent.id == id).first()
+    event = db.session.query(ModelEvent).filter(ModelEvent.adminid == adminId, ModelEvent.id == id).first()
     # event = event.dict()
     
+    if not event:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Event not found.')
+
     #Fetch the user that serves as event admin for his details
     eventAdmin = db.session.query(ModelUser).filter(ModelUser.id == userId).first()
     # eventAdmin = eventAdmin.dict()
@@ -117,6 +82,10 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
         ...
     }'''
 
+    # Initialize genderPercentage
+    genderPercentage['Total'] = [0] * 2
+    for ticketType in eventTicketTypes:
+        genderPercentage[ticketType.name] = [0] * 2
     
     #Event tickets analytics
     ticketsData = dict(list())
@@ -128,6 +97,11 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
         ...
     }'''
 
+    # Initialize ticketsData
+    ticketsData['Total'] = [0] * 2
+    for ticketType in eventTicketTypes:
+        ticketsData[ticketType.name] = [0] * 2
+
     #Store all event attendees
     eventAttendees = []
 
@@ -137,11 +111,11 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
         #Add the ticket price to the total revenue
         revenue+= ticket.price
 
-        if(ticket.checked):
+        if(ticket.checkedin):
             #If the ticket is checked, add it to the checked tickets count and  
-            checked+=1
+            checked += 1
             #Add the ticket as a checked ticket for this specific ticket type
-            ticketsData[ticket.tickettype][0]+=1
+            ticketsData[ticket.tickettype][0] += 1
 
         #Get the attendee who bought this ticket
         attendee = db.session.query(ModelUser).filter(ModelUser.id == ticket.userid).first()
@@ -151,17 +125,14 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
 
         #Increment gender percentage for either male or female count for this specific ticket type
         if(attendee.gender.lower() == 'male'):
-            genderPercentage[ticket.type][0]+=1
+            genderPercentage[ticket.tickettype][0] += 1
+            genderPercentage['Total'][0] += 1
         else:
-            genderPercentage[ticket.type][1]+=1
-
-        #Total attendees of this ticket type
-        genderPercentage[ticket.type].totalCount+=1
+            genderPercentage[ticket.tickettype][1] += 1
+            genderPercentage['Total'][1] += 1
         
         #For each ticket Type, Set the total available tickets of this type => ticketType.limit and add it to ticketsData
         ticketsData[ticket.tickettype][1] = ticketType.limit
-
-
 
     #Set total ticketsData => [total checked tickets, total event capacity]
     ticketsData['Total'] = [checked, event.capacity]
@@ -169,7 +140,8 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
     eventStatistics = {
         "name": event.name,
         "cover": event.profile,
-        "datetime": event.datetime,
+        "date": event.eventstartdatetime.date(),
+        "time": event.eventstartdatetime.time(),
         "description": event.description,
         "venue": event.venue,
         "organizer": eventAdmin.username,
@@ -177,7 +149,7 @@ async def getEventStatistics(id: int,userId: Annotated[int, Depends(getCurrentUs
             "capacity": event.capacity,
             "soldTickets": len(eventTickets),
             "revenue": revenue,
-            "checked": checked,
+            "checkedIn": checked,
             "gateStaff": 5,
         },
         "genderPercentage":  genderPercentage,

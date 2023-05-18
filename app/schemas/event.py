@@ -13,10 +13,8 @@ class Event(BaseModel):
     description: str
     venue: str
     ticketTypes: List[TicketType]
-
     creationdate: Optional[datetime]
     adminid: Optional[int]
-
     type: Optional[str]
     status: Optional[str]
     registrationstartdatetime: Optional[datetime]
@@ -27,6 +25,7 @@ class Event(BaseModel):
     class Config:
         orm_mode = True
 
+
 class AdminEvent(BaseModel):
     name: str
     profile: str
@@ -36,6 +35,7 @@ class AdminEvent(BaseModel):
     description: str
     venue: str
     ticketTypes: List[AdminTicketType]
+
 
 class UserEventBooking(BaseModel):
     id: Optional[UUID] = None
