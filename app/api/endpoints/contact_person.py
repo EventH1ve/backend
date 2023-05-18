@@ -28,6 +28,6 @@ async def listContactPersons(skip: int = 0, limit: int = 10):
 
 
 @router.get('/{id}', response_model=ContactPerson)
-async def getContactPersonById(id: int, skip: int = 0, limit: int = 10):
+async def getContactPersonById(id: int):
     contactPerson = db.session.query(ModelContactPerson).filter(ModelContactPerson.id == id).first()
     return contactPerson if contactPerson else {}
