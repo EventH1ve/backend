@@ -33,7 +33,7 @@ async def getAdminEvent(id: int, userId: Annotated[int, Depends(getCurrentUserId
         "date": event.date,
         "description": event.description,
         "cover": event.profile,
-        "attendess": eventBookingCount,
+        "attendees": eventBookingCount,
         "tickettypes": ticketTypes
     }
         

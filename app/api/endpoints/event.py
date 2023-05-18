@@ -65,32 +65,29 @@ async def findEventByAdmin(userId: Annotated[int, Depends(getCurrentUserId)], sk
 
 @router.get('/{id}', response_model=SingleEvent)
 async def findEventById(id: int):
-    for event in db.session.query(ModelEvent).with_entities(
+    event = db.session.query(ModelEvent).with_entities(
         ModelEvent.id,
         ModelEvent.name,
         ModelEvent.description,
         ModelEvent.venue,
         ModelEvent.eventstartdatetime.label("date"),
         ModelEvent.profile,
-    ).filter(ModelEvent.id == id).all():
-        types = (db.session
-                 .query(ModelTicketType)
-                 .with_entities(
-                    ModelTicketType.id,
-                    ModelTicketType.name,
-                    ModelTicketType.price,
-                    ModelTicketType.eventid
-                 )
-                 .filter(ModelTicketType.eventid == event.id).all())
-        eventDict = {
-            "name": event.name,
-            "description":event.description,
-            "venue": event.venue,
-            "date": event.date,
-            "cover": event.profile,
-            "tickets": types
-        }
-        singleEvent = SingleEvent.parse_obj(eventDict)
+    ).filter(ModelEvent.id == id).first()
+
+    if not event:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Event not found.')
+
+    types = (db.session.query(ModelTicketType)
+                .filter(ModelTicketType.eventid == event.id).all())
+    eventDict = {
+        "name": event.name,
+        "description":event.description,
+        "venue": event.venue,
+        "date": event.date,
+        "cover": event.profile,
+        "tickets": types
+    }
+    singleEvent = SingleEvent.parse_obj(eventDict)
     return singleEvent
 
 
@@ -104,7 +101,7 @@ async def createEvent(event: AdminEvent, userId: Annotated[int, Depends(getCurre
     event_data.pop("date", None)
     event_data.pop("time", None)
     admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
-    if(not admin):
+    if not admin:
         adminModel = ModelAdmin(userid=userId)
         db.session.add(adminModel)
         db.session.commit()
