@@ -16,10 +16,10 @@ JWT_ALGORITHM = os.environ['JWT_ALGORITHM']
 def sign(userId: str) -> str:
     payload = {
         "user_id": userId,
-        "expires": time.time() + 600
+        "expires": time.time() + 10000
     }
     
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM).decode("utf-8")
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
     return str(token)
 
