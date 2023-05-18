@@ -19,7 +19,7 @@ def sign(userId: str) -> str:
         "expires": time.time() + 10000
     }
     
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM).decode("utf-8")
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
     return str(token)
 

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi_sqlalchemy import db
 from sqlalchemy import func
 from models.user import User as ModelUser
+from lib.auth.jwt_bearer import getCurrentUserId
 from models.event import Event as ModelEvent
 from models.ticket import TicketType as ModelTicketType
 from schemas.event import Event, ListEvent, SingleEvent, MobileEvent
@@ -112,5 +113,3 @@ async def createEvent(event: Event, userId: Annotated[int, Depends(getCurrentUse
         "success": True,
         "message": "Event created."
     }
-
-
