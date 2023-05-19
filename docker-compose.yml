@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; cd app; alembic upgrade head; uvicorn main:app --host 0.0.0.0 --port 8000'
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    env_file:
+      - ./app/.env
+    depends_on:
+      - db
+  
+  db:
+    image: postgres:15.3-alpine
+    volumes:
+      - psqlData:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=eventhive
+
+volumes:
+  psqlData:
