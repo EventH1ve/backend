@@ -1,5 +1,5 @@
 from typing import Optional, List
-from datetime import datetime, date, time
+from datetime import datetime
 from pydantic import BaseModel
 from schemas.ticket import TicketType, AdminTicketType
 from uuid import UUID
@@ -70,7 +70,7 @@ class MobileEvent(BaseModel):
     date: datetime
     price: Optional[int] = 0
     img: str
-    isEnabled:str
+    isEnabled: bool
     tickettypes: List[TicketType]
 
     class Config:
