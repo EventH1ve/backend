@@ -3,10 +3,13 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi_sqlalchemy import db
 from models.event import UserEventBooking as ModelUserEventBooking
 from models.user import User as ModelUser
+from models.ticket import TicketType as ModelTicketType
 from schemas.payment import PaymentInfo
 from schemas.event import UserEventBooking
+from schemas.ticket import TicketType
 from lib.auth.jwt_bearer import getCurrentUserId
 from lib.ticket.qrcode_handler import generateTicketQR
+from lib.ticket.seat_handler import bookSeats
 from dotenv import load_dotenv
 import os
 from twilio.rest import Client
@@ -50,6 +53,19 @@ async def createPaymentEntry(paymentInfo: PaymentInfo, userId: Annotated[int, De
                 to=f"whatsapp:+2{userPhoneNumber[0]}",
                 from_="whatsapp:+14155238886",
                 body=f'Thank you for using EventHive!\n\nYour order ID is {paymentInfo.orderId}\n\nYour ticket\'s QR Code can be accessed on the following link: {qrURL}\n\nEnjoy your event!')
+
+        # Mark booked seats
+        ticketType = (db.session.query(ModelTicketType)
+                    .filter(ModelTicketType.eventid == paymentInfo.eventId, ModelTicketType.name == order['ticket_type'])
+                    .first())
+        
+        bookSeats(order['seats'], ticketType)
+        
+        (db.session.query(ModelTicketType)
+        .filter(ModelTicketType.eventid == paymentInfo.eventId, ModelTicketType.name == order['ticket_type'])
+        .update({ModelTicketType.seats: ticketType.seats}))
+        
+    db.session.commit()
 
     return {
         "qrURL": ticketLinks
