@@ -52,7 +52,7 @@ async def createPaymentEntry(paymentInfo: PaymentInfo, userId: Annotated[int, De
             twilioClient.messages.create(
                 to=f"whatsapp:+2{userPhoneNumber[0]}",
                 from_="whatsapp:+14155238886",
-                body=f'Thank you for using EventHive!\n\nYour order ID is {paymentInfo.orderId}\n\nYour ticket\'s QR Code can be accessed on the following link: {qrURL}\n\nEnjoy your event!')
+                body=f'Thank you for using EventHive!\n\nYour order ID is {paymentInfo.orderId}\n\nYour ticket type is {order["ticket_type"]}\n\nYour ticket\'s QR Code can be accessed on the following link: {qrURL}\n\nEnjoy your event!')
 
         # Mark booked seats
         ticketType = (db.session.query(ModelTicketType)
@@ -64,7 +64,7 @@ async def createPaymentEntry(paymentInfo: PaymentInfo, userId: Annotated[int, De
         (db.session.query(ModelTicketType)
         .filter(ModelTicketType.eventid == paymentInfo.eventId, ModelTicketType.name == order['ticket_type'])
         .update({ModelTicketType.seats: ticketType.seats}))
-        
+
     db.session.commit()
 
     return {
