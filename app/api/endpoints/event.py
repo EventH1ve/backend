@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Annotated
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi_sqlalchemy import db
-from sqlalchemy import func
+from sqlalchemy import func, desc
 from models.user import User as ModelUser
 from lib.auth.jwt_bearer import getCurrentUserId
 from models.event import Event as ModelEvent
@@ -41,7 +41,7 @@ async def findEventsByAdmin(userId: Annotated[int, Depends(getCurrentUserId)], s
         ModelEvent.eventstartdatetime.label("date"),
         func.min(ModelTicketType.price).label("price"),
         ModelEvent.profile,
-    ).filter(ModelEvent.adminid == userId).join(ModelTicketType, isouter=True).group_by(ModelEvent.id).offset(skip).limit(limit).all():
+    ).filter(ModelEvent.adminid == userId).join(ModelTicketType, isouter=True).group_by(ModelEvent.id).order_by(desc(ModelEvent.eventstartdatetime)).offset(skip).limit(limit).all():
         eventstartdatetime = event.date
         isEnabled = True if eventstartdatetime.date() == now else False
         types = db.session.query(ModelTicketType).filter(ModelTicketType.eventid == event.id).all()
