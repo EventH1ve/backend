@@ -27,6 +27,9 @@ async def getAdminEvent(id: int, userId: Annotated[int, Depends(getCurrentUserId
     ticketTypes = db.session.query(ModelTicketType).filter(ModelTicketType.eventid == event.id).all()
     eventBookingCount = len( db.session.query(UserEventBooking).filter(UserEventBooking.eventid == event.id).all() )
 
+    admin = db.session.query(ModelAdmin).filter(ModelAdmin.id == event.adminid).first()
+
+
     eventDict = {
         "name": event.name,
         "venue": event.venue,
@@ -34,7 +37,8 @@ async def getAdminEvent(id: int, userId: Annotated[int, Depends(getCurrentUserId
         "description": event.description,
         "cover": event.profile,
         "attendees": eventBookingCount,
-        "tickettypes": ticketTypes
+        "tickettypes": ticketTypes,
+        "organizer": f'{admin.user.firstname} {admin.user.lastname}'
     }
         
     return eventDict

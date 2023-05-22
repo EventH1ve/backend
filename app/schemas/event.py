@@ -84,6 +84,7 @@ class SingleEvent(BaseModel):
     cover: str  # change "profile" to "cover"
     tickets: List[TicketType]
     description:str
+    organizer: str
 
 
     class Config:
