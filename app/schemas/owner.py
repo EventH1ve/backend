@@ -27,3 +27,21 @@ class OwnerMetrics(BaseModel):
     admins: List[QueryAdmin]
 
 
+class OrganizerRequest(BaseModel):
+    id: Optional[int]
+    username: str
+    password: str
+    firstname: str
+    lastname: str
+    email: str
+    phonenumber: str
+    gender: str
+    logo: str
+
+
+class UnapprovedAdmin(BaseModel):
+    id: int
+    username: str
+    firstname: str
+    lastname: str
+    email: str
