@@ -37,6 +37,7 @@ class OrganizerRequest(BaseModel):
     phonenumber: str
     gender: str
     logo: str
+    subscription: int
 
 
 class UnapprovedAdmin(BaseModel):

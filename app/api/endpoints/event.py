@@ -72,10 +72,13 @@ async def findEventById(id: int):
         ModelEvent.venue,
         ModelEvent.eventstartdatetime.label("date"),
         ModelEvent.profile,
+        ModelEvent.adminid
     ).filter(ModelEvent.id == id).first()
 
     if not event:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Event not found.')
+
+    admin = db.session.query(ModelAdmin).filter(ModelAdmin.id == event.adminid).first()
 
     types = (db.session.query(ModelTicketType)
                 .filter(ModelTicketType.eventid == event.id).all())
@@ -85,7 +88,8 @@ async def findEventById(id: int):
         "venue": event.venue,
         "date": event.date,
         "cover": event.profile,
-        "tickets": types
+        "tickets": types,
+        "organizer": f'{admin.user.firstname} {admin.user.lastname}'
     }
     singleEvent = SingleEvent.parse_obj(eventDict)
     return singleEvent

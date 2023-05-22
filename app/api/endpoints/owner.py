@@ -87,6 +87,8 @@ async def organizerRequest(orgReq: OrganizerRequest):
     
     adminModel = ModelAdmin(userid=userModel.id)
     adminModel.logo = orgReq.logo
+    adminModel.active = True
+    adminModel.membershipend = datetime.datetime.now() + datetime.timedelta(days=orgReq.subscription)
     db.session.add(adminModel)
     db.session.commit()
 
