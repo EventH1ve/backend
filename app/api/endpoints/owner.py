@@ -1,6 +1,7 @@
 from typing import Annotated, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from datetime import datetime, timedelta
+from models.partner import Partner as ModelPartner
 from models.user import User as ModelUser
 from models.admin import Admin as ModelAdmin
 from models.event import Event as ModelEvent, UserEventBooking as ModelUserEventBooking
@@ -90,6 +91,11 @@ async def organizerRequest(orgReq: OrganizerRequest):
     adminModel.active = True
     adminModel.membershipend = datetime.now() + timedelta(days=orgReq.subscription)
     db.session.add(adminModel)
+    db.session.commit()
+
+    partnerModel = ModelPartner()
+    partnerModel.name = f'{orgReq.firstname} {orgReq.lastname}'
+    partnerModel.img = orgReq.logo
     db.session.commit()
 
     return {
