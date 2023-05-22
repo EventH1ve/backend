@@ -52,6 +52,11 @@ async def login(loginUser: LoginUser):
     if not bcrypt.checkpw(loginUser.password.encode('utf-8'), user.password.encode('utf-8')):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Invalid credentials.')
 
+    if user.type == 'admin':
+        unapproved = db.session.query(ModelAdmin).filter(user.id == ModelAdmin.userid, ModelAdmin.active.is_(False)).first()
+        if unapproved:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Unapproved organizer.')
+
     return {
         "success": True,
         "message": "Login successful.",

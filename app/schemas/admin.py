@@ -8,6 +8,7 @@ class Admin(BaseModel):
     id: Optional[int] = None
     userid: int 
     membershipend: datetime
+    active: Optional[bool]
 
     class Config:
         orm_mode = True
