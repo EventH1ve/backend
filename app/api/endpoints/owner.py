@@ -1,6 +1,6 @@
 from typing import Annotated, List
 from fastapi import APIRouter, Depends, HTTPException, status
-from datetime import datetime
+from datetime import datetime, timedelta
 from models.user import User as ModelUser
 from models.admin import Admin as ModelAdmin
 from models.event import Event as ModelEvent, UserEventBooking as ModelUserEventBooking
@@ -88,7 +88,7 @@ async def organizerRequest(orgReq: OrganizerRequest):
     adminModel = ModelAdmin(userid=userModel.id)
     adminModel.logo = orgReq.logo
     adminModel.active = True
-    adminModel.membershipend = datetime.datetime.now() + datetime.timedelta(days=orgReq.subscription)
+    adminModel.membershipend = datetime.now() + timedelta(days=orgReq.subscription)
     db.session.add(adminModel)
     db.session.commit()
 
