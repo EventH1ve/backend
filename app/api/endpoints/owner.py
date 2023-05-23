@@ -96,6 +96,7 @@ async def organizerRequest(orgReq: OrganizerRequest):
     partnerModel = ModelPartner()
     partnerModel.name = f'{orgReq.firstname} {orgReq.lastname}'
     partnerModel.img = orgReq.logo
+    db.session.add(partnerModel)
     db.session.commit()
 
     return {
