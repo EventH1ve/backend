@@ -110,7 +110,7 @@ async def createEvent(event: AdminEvent, userId: Annotated[int, Depends(getCurre
         db.session.add(adminModel)
         db.session.commit()
     
-    event_data['adminid'] = userId
+    event_data['adminid'] = admin.id
     
     createdEvent = ModelEvent(**event_data)
     db.session.add(createdEvent)
