@@ -96,12 +96,13 @@ def test_findVenue():
 
 
 
-def test_addVenueRestriction(tet_client):
+def test_addVenueRestriction():
     # Create a test venue restriction
-    test_restriction = VenueRestriction(restriction_type="Test Restriction", details="Test details")
+    
+    test_restriction = VenueRestriction(id = 0, venueid = 0, restriction = "test restriction")
 
     # Send a POST request to add the venue restriction
-    response = client.post("/venue/restriction", json=test_restriction.dict())
+    response = client.post("/restriction", json=test_restriction.dict())
    
     assert response.status_code == 200
    
@@ -166,5 +167,10 @@ def test_getVenueContacts():
 
     # Perform assertions to verify the response data
     assert isinstance(data, list)
-    # Add more assertions or queries to verify the venue contacts retrieved from the database
 
+    for item in data:
+        assert isinstance(item, dict)
+        assert 'id' in item
+        assert 'venueid' in item
+        assert 'contactid' in item
+     
