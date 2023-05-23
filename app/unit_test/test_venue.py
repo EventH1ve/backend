@@ -1,7 +1,9 @@
 from fastapi.testclient import TestClient
 from main import app
+from fastapi_sqlalchemy import db
 from models.venue import Venue as ModelVenue, VenueRestriction, VenueContact as ModelVenueContact, ContactPerson as ModelContactPerson
 from schemas.venue import Venue, VenueRestriction, VenueContact, ContactPerson
+
 
 client = TestClient(app)
 
@@ -16,15 +18,32 @@ def test_listVenues():
    
     assert isinstance(data, list)
 
+    for item in data:
+        assert isinstance(item, dict)
+        assert "id"in item
+        assert "name"in item
+        assert "capacity"in item
+        assert "description" in item
+        assert "createdby" in item
+        assert "buildingnumber" in item
+        assert "streetname" in item
+        assert "city" in item
+        assert "country" in item
+
 
 
 def test_createVenue():
     venue_data = {
-        "name": "Test Venue",
-        "address": "123 Test St",
-        "city": "Test City",
-        "country": "Test Country"
-        # Add other required fields based on the Venue schema
+        # dummy data example
+        "id": 1,
+        "name": "city hall",
+        "capacity": 100,
+        "description": "test venue",
+        "createdby": "ahmad mahmoud",
+        "buildingnumber": 3,
+        "streetname": "street",
+        "city": "Cairo",
+        "country": "Egypt"
     }
 
     response = client.post("/", json=venue_data)
@@ -33,15 +52,36 @@ def test_createVenue():
    
     data = response.json()
    
+    assert "success" in data
+    assert "message" in data
+
     assert data["success"] is True
     assert data["message"] == "Venue created."
+
+    # Query the database to check if the venue was created
+    venue = db.session.query(ModelVenue).filter(
+        ModelVenue.name == venue_data["name"]).first()
+    
+    assert venue is not None
+    assert venue.name == venue_data["name"]
+    db.session.delete(venue)
+    db.session.commit()
 
 
 
 
 def test_findVenue():
     # Create a test venue in the database
-    test_venue = ModelVenue(name="Test Venue", address="123 Test St", city="Test City", country="Test Country")
+    test_venue = ModelVenue(name="Test Venue",
+        id= 37,
+        streetname="123 Test St",
+        city="Test City",
+        country="Test Country",
+        capacity = 100,
+        description = "test venue",
+        createdby = "ahmad mahmoud",
+        buildingnumber = 3,)
+    
     db.session.add(test_venue)
     db.session.commit()
 
@@ -92,10 +132,9 @@ def test_getVenueRestrictions():
 def test_addVenueContact():
     # Create a test venue contact object
     test_venue_contact = {
-        "venueId": 1,
-        "contactName": "John Doe",
-        "contactEmail": "johndoe@example.com",
-        "contactPhone": "1234567890"
+        "id": 1,
+        "venueid": 1,
+        "contactid": 2,
     }
 
     # Send a POST request to add the venue contact
