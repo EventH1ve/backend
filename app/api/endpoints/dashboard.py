@@ -82,7 +82,7 @@ async def getAdminDashboardMetrics(userId: Annotated[int, Depends(getCurrentUser
                         ModelEvent.venue,
                         ModelEvent.eventstartdatetime.label("date"),
                         )
-                        .join(ModelAdmin, ModelEvent.adminid == ModelAdmin.userid)
+                        .join(ModelAdmin, ModelEvent.adminid == ModelAdmin.id)
                         .filter(ModelAdmin.userid == userId, ModelEvent.eventstartdatetime > datetime.isoformat(datetime.now()))
                         .all())
     
@@ -93,7 +93,7 @@ async def getAdminDashboardMetrics(userId: Annotated[int, Depends(getCurrentUser
                         ModelEvent.venue,
                         ModelEvent.eventstartdatetime.label("date"),
                       )
-                      .join(ModelAdmin, ModelEvent.adminid == ModelAdmin.userid)
+                      .join(ModelAdmin, ModelEvent.adminid == ModelAdmin.id)
                       .filter(ModelAdmin.userid == userId, ModelEvent.eventstartdatetime <= datetime.isoformat(datetime.now()))
                       .all())
     
