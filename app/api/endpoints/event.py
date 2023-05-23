@@ -31,6 +31,7 @@ async def listEvents(skip: int = 0, limit: int = 10):
 @router.get('/app', response_model=List[MobileEvent])
 async def findEventsByAdmin(userId: Annotated[int, Depends(getCurrentUserId)], skip: int = 0, limit: int = 10):
     events = []
+    admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
     now = datetime.now().date()
     for event in db.session.query(ModelEvent).with_entities(
         ModelEvent.id,
@@ -41,7 +42,7 @@ async def findEventsByAdmin(userId: Annotated[int, Depends(getCurrentUserId)], s
         ModelEvent.eventstartdatetime.label("date"),
         func.min(ModelTicketType.price).label("price"),
         ModelEvent.profile,
-    ).filter(ModelEvent.adminid == userId).join(ModelTicketType, isouter=True).group_by(ModelEvent.id).order_by(desc(ModelEvent.eventstartdatetime)).offset(skip).limit(limit).all():
+    ).filter(ModelEvent.adminid == admin.id).join(ModelTicketType, isouter=True).group_by(ModelEvent.id).order_by(desc(ModelEvent.eventstartdatetime)).offset(skip).limit(limit).all():
         eventstartdatetime = event.date
         isEnabled = True if eventstartdatetime.date() == now else False
         types = db.session.query(ModelTicketType).filter(ModelTicketType.eventid == event.id).all()
@@ -104,11 +105,10 @@ async def createEvent(event: AdminEvent, userId: Annotated[int, Depends(getCurre
     
     event_data.pop("date", None)
     event_data.pop("time", None)
+
     admin = db.session.query(ModelAdmin).filter(ModelAdmin.userid == userId).first()
     if not admin:
-        adminModel = ModelAdmin(userid=userId)
-        db.session.add(adminModel)
-        db.session.commit()
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User is not an admin.')
     
     event_data['adminid'] = admin.id
     
