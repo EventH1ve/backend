@@ -30,7 +30,8 @@ async def getDashboardMetrics(userId: Annotated[int, Depends(getCurrentUserId)])
                         ModelEvent.eventstartdatetime.label("date"),
                         ModelUserEventBooking.price,
                         ModelUserEventBooking.transactionid,
-                        ModelUserEventBooking.userid
+                        ModelUserEventBooking.userid,
+                        ModelUserEventBooking.tickettype
                       )
                       .join(ModelUserEventBooking, ModelEvent.id == ModelUserEventBooking.eventid)
                       .filter(ModelUserEventBooking.userid == userId, ModelEvent.eventstartdatetime > datetime.isoformat(datetime.now()))
@@ -43,7 +44,8 @@ async def getDashboardMetrics(userId: Annotated[int, Depends(getCurrentUserId)])
                         ModelEvent.venue,
                         ModelEvent.eventstartdatetime.label("date"),
                         ModelUserEventBooking.price,
-                        ModelUserEventBooking.transactionid
+                        ModelUserEventBooking.transactionid,
+                        ModelUserEventBooking.tickettype
                       )
                       .join(ModelUserEventBooking, ModelEvent.id == ModelUserEventBooking.eventid)
                       .filter(ModelUserEventBooking.userid == userId, ModelEvent.eventstartdatetime <= datetime.isoformat(datetime.now()))

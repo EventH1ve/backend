@@ -99,6 +99,7 @@ class DashboardEvent(BaseModel):
     price: float
     status: Optional[str] = "Paid"
     transactionid: str
+    tickettype: str
 
     class Config:
         orm_mode = True
