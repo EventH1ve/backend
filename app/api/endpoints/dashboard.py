@@ -31,7 +31,7 @@ async def getDashboardMetrics(userId: Annotated[int, Depends(getCurrentUserId)])
                         ModelUserEventBooking.price,
                         ModelUserEventBooking.transactionid,
                         ModelUserEventBooking.userid
-                      )
+                      ).distinct(ModelEvent.name)
                       .join(ModelUserEventBooking, ModelEvent.id == ModelUserEventBooking.eventid)
                       .filter(ModelUserEventBooking.userid == userId, ModelEvent.eventstartdatetime > datetime.isoformat(datetime.now()))
                       .all())
