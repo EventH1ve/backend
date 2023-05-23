@@ -31,7 +31,7 @@ async def getDashboardMetrics(userId: Annotated[int, Depends(getCurrentUserId)])
                         ModelUserEventBooking.price,
                         ModelUserEventBooking.transactionid,
                         ModelUserEventBooking.userid
-                      ).distinct(ModelEvent.name)
+                      )
                       .join(ModelUserEventBooking, ModelEvent.id == ModelUserEventBooking.eventid)
                       .filter(ModelUserEventBooking.userid == userId, ModelEvent.eventstartdatetime > datetime.isoformat(datetime.now()))
                       .all())
@@ -49,12 +49,18 @@ async def getDashboardMetrics(userId: Annotated[int, Depends(getCurrentUserId)])
                       .filter(ModelUserEventBooking.userid == userId, ModelEvent.eventstartdatetime <= datetime.isoformat(datetime.now()))
                       .all())
     
+    eventCount = (db.session.query(ModelEvent)
+                  .join(ModelUserEventBooking, ModelEvent.id == ModelUserEventBooking.eventid)
+                  .filter(ModelUserEventBooking.userid == userId)
+                  .distinct(ModelEvent.name)
+                  .count())
+
     membershipDuration = datetime.now() - createdAt
 
     return {
         "counters": {
             "upcomingEvents": len(upcomingEvents),
-            "joinedEvents": len(upcomingEvents) + len(previousEvents),
+            "joinedEvents": eventCount,
             "membershipSince": f'{ceil(membershipDuration.total_seconds() / (60 * 60 * 24))} Days'
         },
         "upcomingEvents": parse_obj_as(List[DashboardEvent], upcomingEvents),
